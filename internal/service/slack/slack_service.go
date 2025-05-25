@@ -18,6 +18,14 @@ func New(config config.Slack) *slackService {
 	}
 }
 
+func (service *slackService) GetUser(email string) (messenger.User, error) {
+	//TODO implement me
+	return messenger.User{
+		Id:   "default",
+		Name: "ektov",
+	}, nil
+}
+
 func (service *slackService) GetThread(channel string, ts string) (messenger.Thread, error) {
 	//TODO implement me
 	res := messenger.Thread{

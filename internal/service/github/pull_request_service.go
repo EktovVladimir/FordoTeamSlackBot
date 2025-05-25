@@ -48,7 +48,7 @@ func (p *pullRequestService) GetCommits(repo string, number string) ([]git.Commi
 	//TODO implement me
 	return []git.Commit{
 		{"OTAB-123 = test commit"},
-		{"OTAB-777 + test commit 2"},
+		{"OTAB-123 + test commit 2"},
 	}, nil
 }
 

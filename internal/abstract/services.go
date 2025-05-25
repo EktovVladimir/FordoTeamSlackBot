@@ -14,11 +14,12 @@ type PullRequestService interface {
 }
 
 type IssueTrackerService interface {
-	Get(number string) issues.Issue
-	GetList(numbers []string) []issues.Issue
+	Get(number string) (issues.Issue, error)
+	GetList(numbers []string) ([]issues.Issue, error)
 }
 
 type MessengerService interface {
+	GetUser(email string) (messenger.User, error)
 	GetThread(channel string, ts string) (messenger.Thread, error)
 	SearchThreadLast(channel string, searchCriteria string) (messenger.Thread, error)
 	SearchCommentLast(channel string, ts string, searchCriteria string) (messenger.Comment, error)
@@ -26,4 +27,8 @@ type MessengerService interface {
 	UpdateThread(channel string, thread *messenger.Thread) error
 	CreateComment(channel string, ts string, comment *messenger.Comment) error
 	UpdateComment(channel string, ts string, comment *messenger.Comment) error
+}
+
+type SettingsService interface {
+	GetStringItem(source Source, key string) string
 }
