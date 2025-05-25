@@ -1,13 +1,13 @@
 package review
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/github"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/slack"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/git"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/messenger"
 )
 
 type Request struct {
-	requester    slack.User
-	reviewers    []slack.User
-	pullRequests []github.PullRequest
+	requester    messenger.User
+	reviewers    []messenger.User
+	pullRequests []git.PullRequest
 	randomCount  int
 }

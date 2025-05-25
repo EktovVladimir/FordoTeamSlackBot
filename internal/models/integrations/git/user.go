@@ -1,4 +1,4 @@
-package github
+package git
 
 type User struct {
 	Login string

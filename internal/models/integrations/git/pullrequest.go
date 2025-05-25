@@ -1,4 +1,4 @@
-package github
+package git
 
 type PullRequest struct {
 	Branch     string
@@ -6,4 +6,6 @@ type PullRequest struct {
 	Number     string
 	Repo       string
 	State      string
+	Requester  User
+	Reviewers  []User
 }

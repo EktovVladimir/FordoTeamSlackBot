@@ -1,11 +1,11 @@
 package shared
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/github"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/slack"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/git"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/messenger"
 )
 
 type UserLink struct {
-	SlackUser  slack.User
-	GithubUser github.User
+	SlackUser  messenger.User
+	GithubUser git.User
 }
