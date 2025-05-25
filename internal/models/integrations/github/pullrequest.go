@@ -3,6 +3,7 @@ package github
 type PullRequest struct {
 	Branch     string
 	BaseBranch string
-	Code       string
+	Number     string
 	Repo       string
+	State      string
 }

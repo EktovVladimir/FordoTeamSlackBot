@@ -1,5 +1,6 @@
 package github
 
 type User struct {
-	Code string
+	Login string
+	Email string
 }
