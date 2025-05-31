@@ -2,7 +2,6 @@ package run
 
 import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/request_source"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/repository"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/service"
 	"sync"
 )
@@ -26,8 +25,8 @@ func RunHw16() *sync.WaitGroup {
 		service.NewSlackEventGenerator(25, 50),
 		service.NewGithubEventGenerator(10, 50))
 
-	repository.StartEventReader(ch, wg)
-	repository.StartEventLogger(200)
+	service.StartEventReader(ch, wg)
+	service.StartEventLogger(200)
 
 	return wg
 }
