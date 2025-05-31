@@ -1,4 +1,4 @@
-package jira
+package issues
 
 type Issue struct {
 	Code  string

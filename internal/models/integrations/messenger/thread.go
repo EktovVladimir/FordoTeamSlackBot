@@ -1,8 +1,9 @@
-package slack
+package messenger
 
 type Thread struct {
 	Ts          string
-	IsBot       bool
+	UserId      string
+	BotId       string
 	Text        string
 	Attachments []Attachment
 	Blocks      []Block

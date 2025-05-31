@@ -1,4 +1,4 @@
-package slack
+package messenger
 
 type Comment struct {
 	Ts   string

@@ -1,5 +1,7 @@
 package github
 
+import "github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/git"
+
 type Workflow struct {
 	Event string
 	Type  string
@@ -7,12 +9,12 @@ type Workflow struct {
 
 type PullRequestWorkflow struct {
 	Workflow
-	PullRequest PullRequest
+	PullRequest git.PullRequest
 }
 
 type ReviewWorkflow struct {
 	Workflow
-	PullRequest PullRequest
+	PullRequest git.PullRequest
 	State       string
 }
 
