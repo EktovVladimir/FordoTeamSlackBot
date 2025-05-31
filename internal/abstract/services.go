@@ -32,3 +32,7 @@ type MessengerService interface {
 type SettingsService interface {
 	GetStringItem(source Source, key string) string
 }
+
+type DeployService interface {
+	CreateThread(pr git.PullRequest, source Source) error
+}

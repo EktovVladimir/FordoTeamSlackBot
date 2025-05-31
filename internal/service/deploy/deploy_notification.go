@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/abstract"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/helpers"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/git"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/integrations/messenger"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/request_source"
@@ -14,22 +15,13 @@ import (
 )
 
 type deploySlackNotification struct {
-	prService       abstract.PullRequestService
-	slackService    abstract.MessengerService
-	issueService    abstract.IssueTrackerService
-	settingsService abstract.SettingsService
+	infra models.Infrastructure
 }
 
 func New(
-	prService abstract.PullRequestService,
-	slackService abstract.MessengerService,
-	issueService abstract.IssueTrackerService,
-	settingsService abstract.SettingsService) *deploySlackNotification {
+	infra models.Infrastructure) *deploySlackNotification {
 	return &deploySlackNotification{
-		prService,
-		slackService,
-		issueService,
-		settingsService,
+		infra,
 	}
 }
 
@@ -42,12 +34,12 @@ func (s *deploySlackNotification) CreateThread(pr git.PullRequest, source abstra
 		slackUser = src.User
 		channelName = src.Channel
 	case request_source.Workflow:
-		user, err := s.slackService.GetUser(pr.Requester.Email)
+		user, err := s.infra.SlackService.GetUser(pr.Requester.Email)
 		if err == nil {
 			slackUser = user
 		}
 
-		channelName = s.settingsService.GetStringItem(source, settings.ChannelIdKey)
+		channelName = s.infra.SettingsService.GetStringItem(source, settings.ChannelIdKey)
 	}
 
 	userLink := shared.UserLink{GithubUser: pr.Requester, SlackUser: slackUser}
@@ -59,7 +51,7 @@ func (s *deploySlackNotification) CreateThread(pr git.PullRequest, source abstra
 		},
 	}
 
-	err := s.slackService.CreateThread(channelName, thread)
+	err := s.infra.SlackService.CreateThread(channelName, thread)
 
 	if err != nil {
 		panic(err)
@@ -67,16 +59,16 @@ func (s *deploySlackNotification) CreateThread(pr git.PullRequest, source abstra
 
 	//TODO сохранение в репу
 
-	commits, err := s.prService.GetCommits(pr.Repo, pr.Number)
+	commits, err := s.infra.PrService.GetCommits(pr.Repo, pr.Number)
 
 	if err != nil {
 		panic(err)
 	}
 
-	taskPrefix := s.settingsService.GetStringItem(source, settings.IssuePrefixKey)
+	taskPrefix := s.infra.SettingsService.GetStringItem(source, settings.IssuePrefixKey)
 	issueNumbers := extractIssues(commits, taskPrefix)
 
-	issues, err := s.issueService.GetList(issueNumbers)
+	issues, err := s.infra.IssueService.GetList(issueNumbers)
 
 	if err != nil {
 		panic(err)
@@ -88,7 +80,7 @@ func (s *deploySlackNotification) CreateThread(pr git.PullRequest, source abstra
 		Text: issuesText,
 	}
 
-	err = s.slackService.CreateComment(channelName, thread.Ts, comment)
+	err = s.infra.SlackService.CreateComment(channelName, thread.Ts, comment)
 
 	if err != nil {
 		panic(err)
