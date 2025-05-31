@@ -1,8 +1,14 @@
 package main
 
-import "github.com/EktovVladimir/FordoTeamSlackBot/run"
+import (
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/service"
+	"time"
+)
 
 func main() {
-	app := run.NewApp()
-	run.RunTest1(app)
+	for i := 0; i < 25; i++ {
+		service.GenerateAndStore()
+
+		time.Sleep(100 * time.Millisecond)
+	}
 }
