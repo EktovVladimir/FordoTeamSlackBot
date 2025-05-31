@@ -1,14 +1,12 @@
 package main
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/service"
-	"time"
+	"fmt"
+	"github.com/EktovVladimir/FordoTeamSlackBot/run"
 )
 
 func main() {
-	for i := 0; i < 25; i++ {
-		service.GenerateAndStore()
+	run.RunHw16().Wait()
 
-		time.Sleep(100 * time.Millisecond)
-	}
+	fmt.Println("Application finished")
 }

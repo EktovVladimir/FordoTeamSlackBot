@@ -1,27 +1,36 @@
 package service
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/event"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/repository"
-	"math/rand"
+	"sync"
 )
 
-func GenerateEvent() repository.Event {
-	//Для выполнения ДЗ, это генератор случайных событий,
-	//В будущем планируются реальные слушатели команд бота,
-	//вызовы из api и веб-хуки github
-
-	eventType := rand.Intn(2)
-
-	switch eventType {
-	case 0:
-		return event.GenerateRandomSlackCommandEvent()
-	default:
-		return event.GenerateRandomPullRequestEvent()
-	}
+type eventGenerator interface {
+	Start() <-chan repository.Event
 }
 
-func GenerateAndStore() {
-	event := GenerateEvent()
-	repository.StoreEvent(event)
+func StartGenerators(wg *sync.WaitGroup, generators ...eventGenerator) <-chan repository.Event {
+	out := make(chan repository.Event)
+	closedChannels := make(chan struct{}, len(generators))
+
+	for _, gen := range generators {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ch := gen.Start()
+			for val := range ch {
+				out <- val
+			}
+			closedChannels <- struct{}{}
+		}()
+	}
+
+	go func() {
+		for i := 0; i < len(generators); i++ {
+			<-closedChannels
+		}
+		close(out)
+	}()
+
+	return out
 }
