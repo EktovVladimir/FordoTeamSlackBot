@@ -2,11 +2,10 @@ package event
 
 import (
 	"fmt"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/abstract"
 	"math/rand"
 )
 
-func GenerateRandomPullRequestEvent() abstract.Event {
+func GenerateRandomPullRequestEvent() GithubPullRequestEvent {
 	return GithubPullRequestEvent{
 		Number:     randomPRNumber(),
 		Repo:       randomRepo(),
@@ -17,7 +16,7 @@ func GenerateRandomPullRequestEvent() abstract.Event {
 	}
 }
 
-func GenerateRandomSlackCommandEvent() abstract.Event {
+func GenerateRandomSlackCommandEvent() SlackCommandEvent {
 	return SlackCommandEvent{
 		Command:  randomCommandName(),
 		Args:     randomCommandArgs(),
