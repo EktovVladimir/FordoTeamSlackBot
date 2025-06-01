@@ -1,7 +1,7 @@
 package abstract
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/db"
 )
 
 type DbRepository interface {
