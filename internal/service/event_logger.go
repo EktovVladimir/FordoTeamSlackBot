@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/event"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/shared"
@@ -14,9 +15,9 @@ type loggedSlice[T repository.Event] struct {
 	name      string
 }
 
-func StartEventLogger(intervalMs int) {
+func StartEventLogger(ctx context.Context, intervalMs int) {
 	go func() {
-		exit := false
+		defer fmt.Println("EventLogger: finished")
 
 		loggedGhEvents := &loggedSlice[*event.GithubPullRequestEvent]{
 			slice: repository.GetPullRequestEvents(),
@@ -28,34 +29,33 @@ func StartEventLogger(intervalMs int) {
 			name:  "slack events",
 		}
 
-		for !exit {
-			currentLog := make([]string, 0)
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("EventLogger: context done")
+				return
+			case <-time.After(time.Duration(intervalMs) * time.Millisecond):
+				currentLog := make([]string, 0)
 
-			if logs := processLog[*event.GithubPullRequestEvent](loggedGhEvents); len(logs) > 0 {
-				currentLog = append(currentLog, logs...)
-				fmt.Printf("Found %d new pr events\n", len(logs))
-			}
-
-			if logs := processLog[*event.SlackCommandEvent](loggedSlackEvents); len(logs) > 0 {
-				currentLog = append(currentLog, logs...)
-				fmt.Printf("Found %d new slack events\n", len(logs))
-			}
-
-			if len(currentLog) > 0 {
-				for _, l := range currentLog {
-					fmt.Println(l)
+				if logs := processLog[*event.GithubPullRequestEvent](loggedGhEvents); len(logs) > 0 {
+					currentLog = append(currentLog, logs...)
+					fmt.Printf("Found %d new pr events\n", len(logs))
 				}
-			} else {
-				fmt.Println("Not found new events")
+
+				if logs := processLog[*event.SlackCommandEvent](loggedSlackEvents); len(logs) > 0 {
+					currentLog = append(currentLog, logs...)
+					fmt.Printf("Found %d new slack events\n", len(logs))
+				}
+
+				if len(currentLog) > 0 {
+					for _, l := range currentLog {
+						fmt.Println(l)
+					}
+
+					fmt.Println()
+				}
 			}
-
-			fmt.Println()
-
-			time.Sleep(time.Duration(intervalMs) * time.Millisecond)
 		}
-
-		//Скорее всего никогда не вызовется, так как не дожидаемся завершения этой горутины
-		fmt.Println("EventLogger finished")
 	}()
 }
 

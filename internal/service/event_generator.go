@@ -1,15 +1,16 @@
 package service
 
 import (
+	"context"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/repository"
 	"sync"
 )
 
 type eventGenerator interface {
-	Start() <-chan repository.Event
+	Start(ctx context.Context) <-chan repository.Event
 }
 
-func StartGenerators(wg *sync.WaitGroup, generators ...eventGenerator) <-chan repository.Event {
+func StartGenerators(ctx context.Context, wg *sync.WaitGroup, generators ...eventGenerator) <-chan repository.Event {
 	out := make(chan repository.Event)
 	closedChannels := make(chan struct{}, len(generators))
 
@@ -17,7 +18,7 @@ func StartGenerators(wg *sync.WaitGroup, generators ...eventGenerator) <-chan re
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			ch := gen.Start()
+			ch := gen.Start(ctx)
 			for val := range ch {
 				out <- val
 			}
