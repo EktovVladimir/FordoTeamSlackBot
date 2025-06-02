@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/models/event"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/repository"
@@ -19,18 +20,28 @@ func NewSlackEventGenerator(count int, intervalMs int) *slackEventGenerator {
 	}
 }
 
-func (s *slackEventGenerator) Start() <-chan repository.Event {
+func (s *slackEventGenerator) Start(ctx context.Context) <-chan repository.Event {
 	ch := make(chan repository.Event)
 	go func() {
-		for i := 0; i < s.count; i++ {
-			ev := event.GenerateRandomSlackCommandEvent()
-			ch <- ev
-			time.Sleep(time.Duration(s.intervalMs) * time.Millisecond)
+		defer close(ch)
+		defer fmt.Println("slackEventGenerator: finished")
+
+		counter := 0
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("slackEventGenerator: context done")
+				return
+			case <-time.After(time.Duration(s.intervalMs) * time.Millisecond):
+				if s.count > 0 && counter >= s.count {
+					return
+				}
+
+				ev := event.GenerateRandomSlackCommandEvent()
+				ch <- ev
+				counter++
+			}
 		}
-
-		fmt.Println("slackEventGenerator finished")
-
-		close(ch)
 	}()
 
 	return ch
