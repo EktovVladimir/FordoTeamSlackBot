@@ -13,6 +13,6 @@ func StartEventReader(ch <-chan repository.Event, wg *sync.WaitGroup) {
 		for ev := range ch {
 			repository.StoreEvent(ev)
 		}
-		fmt.Println("EventReader finished")
+		fmt.Println("EventReader: finished")
 	}()
 }
