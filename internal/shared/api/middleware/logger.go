@@ -17,6 +17,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		}()
 
 		reqContent, _ := io.ReadAll(r.Body)
+		r.Body = io.NopCloser(bytes.NewBuffer(reqContent))
 
 		ctxLog := logrus.WithField("msgData", string(reqContent))
 		ctxLog.Infof("Request %s %s", r.Method, r.RequestURI)

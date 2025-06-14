@@ -11,8 +11,9 @@ import (
 )
 
 type Config struct {
-	Log     LogConfig     `config:"log"`
-	CrudApi CrudApiConfig `config:"crudApi"`
+	Log       LogConfig       `config:"log"`
+	CrudApi   CrudApiConfig   `config:"crudApi"`
+	JsonStore JsonStoreConfig `config:"jsonStore"`
 }
 
 type LogConfig struct {
@@ -26,6 +27,10 @@ type CrudApiConfig struct {
 	Port int    `config:"crudApi-port"`
 }
 
+type JsonStoreConfig struct {
+	Path string `config:"jsonStore-path"`
+}
+
 func Load() (*Config, error) {
 	configPath := filepath.Join("configs", "app."+environment.Env+".json")
 
@@ -34,7 +39,17 @@ func Load() (*Config, error) {
 		flags.NewBackend(),
 		env.NewBackend())
 
-	cfg := &Config{
+	cfg := getDefaultConfig()
+
+	if err := loader.Load(context.Background(), cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func getDefaultConfig() *Config {
+	return &Config{
 		Log: LogConfig{
 			Level:  "info",
 			Dir:    "./logs",
@@ -44,11 +59,8 @@ func Load() (*Config, error) {
 			Host: "localhost",
 			Port: 8000,
 		},
+		JsonStore: JsonStoreConfig{
+			Path: "./data",
+		},
 	}
-
-	if err := loader.Load(context.Background(), cfg); err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
 }

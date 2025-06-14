@@ -6,24 +6,34 @@ import (
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/api/middleware"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-type CrudApi struct {
-	cfg config.CrudApiConfig
+type store interface {
+	GetUsers() *db.Entity[*db.User]
+	GetSettings() *db.Entity[*db.Setting]
+	GetDeployments() *db.Entity[*db.Deployment]
+	GetCodeReviews() *db.Entity[*db.CodeReview]
 }
 
-func New(cfg config.CrudApiConfig) *CrudApi {
-	return &CrudApi{cfg}
+type CrudApi struct {
+	cfg config.CrudApiConfig
+	db  store
+}
+
+func New(cfg config.CrudApiConfig, db store) *CrudApi {
+	return &CrudApi{cfg, db}
 }
 
 func (a *CrudApi) Start(ctx context.Context) error {
 	r := mux.NewRouter()
 
 	r.Use(middleware.LoggingMiddleware)
-	r.HandleFunc("/users", getUsers).Methods("GET")
+	r.HandleFunc("/users", a.getUsers).Methods("GET")
+	r.HandleFunc("/users", a.createUser).Methods("POST")
 
 	addr := fmt.Sprintf("%s:%d", a.cfg.Host, a.cfg.Port)
 
@@ -36,7 +46,7 @@ func (a *CrudApi) Start(ctx context.Context) error {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logrus.Fatal(err)
+			logrus.Errorf("Crud Api listen and serve error %v", err)
 		}
 	}()
 
