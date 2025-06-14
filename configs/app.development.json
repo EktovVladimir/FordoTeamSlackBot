@@ -1,0 +1,11 @@
+{
+  "log": {
+    "level": "debug",
+    "dir": "./logs",
+    "maxAge": 10
+  },
+  "crudApi": {
+    "host": "localhost",
+    "port": 8001
+  }
+}

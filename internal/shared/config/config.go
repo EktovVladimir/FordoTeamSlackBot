@@ -11,17 +11,23 @@ import (
 )
 
 type Config struct {
-	Log LogConfig `config:"log"`
+	Log     LogConfig     `config:"log"`
+	CrudApi CrudApiConfig `config:"crudApi"`
 }
 
 type LogConfig struct {
 	Level  string `config:"log-level"`
 	Dir    string `config:"log-dir"`
-	MaxAge int    `config:"log-max_age"`
+	MaxAge int    `config:"log-maxAge"`
+}
+
+type CrudApiConfig struct {
+	Host string `config:"crudApi-host"`
+	Port int    `config:"crudApi-port"`
 }
 
 func Load(ctx context.Context) (*Config, error) {
-	configPath := filepath.Join("configs", "app."+environment.Env+".yaml")
+	configPath := filepath.Join("configs", "app."+environment.Env+".json")
 
 	loader := confita.NewLoader(
 		file.NewBackend(configPath),
@@ -33,6 +39,10 @@ func Load(ctx context.Context) (*Config, error) {
 			Level:  "info",
 			Dir:    "./logs",
 			MaxAge: 90,
+		},
+		CrudApi: CrudApiConfig{
+			Host: "localhost",
+			Port: 8000,
 		},
 	}
 
