@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/EktovVladimir/FordoTeamSlackBot/run"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/hw"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
@@ -18,7 +18,7 @@ func main() {
 	defer logger.Sync()
 	zap.ReplaceGlobals(logger)
 
-	run.RunHw16(ctx).Wait()
+	hw.RunHw16(ctx).Wait()
 
 	fmt.Println("Application finished")
 }
