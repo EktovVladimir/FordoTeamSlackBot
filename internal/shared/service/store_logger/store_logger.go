@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 )
-
-var log = zap.S()
 
 type dataStore interface {
 	GetUsers() []*db.User
@@ -63,7 +61,7 @@ func (sl *storeLogger) Start(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Info("storeLogger done by context")
+			logrus.Info("storeLogger done by context")
 			return
 		case <-time.After(sl.interval):
 			positions, slices := sl.scan()
@@ -100,7 +98,7 @@ func (sl *storeLogger) Start(ctx context.Context) {
 
 			sl.lastPositions = positions
 
-			log.Info(sb.String())
+			logrus.Info(sb.String())
 		}
 	}
 }
