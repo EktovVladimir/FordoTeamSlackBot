@@ -3,13 +3,10 @@ package crud_api
 import (
 	"encoding/json"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func getUsers(w http.ResponseWriter, r *http.Request) {
-	logrus.Debug("GET /users request")
-
 	w.Header().Set("Content-Type", "application/json")
 
 	var dummyRes []db.User

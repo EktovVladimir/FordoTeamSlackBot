@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/api/middleware"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -21,6 +22,7 @@ func New(cfg config.CrudApiConfig) *CrudApi {
 func (a *CrudApi) Start(ctx context.Context) error {
 	r := mux.NewRouter()
 
+	r.Use(middleware.LoggingMiddleware)
 	r.HandleFunc("/users", getUsers).Methods("GET")
 
 	addr := fmt.Sprintf("%s:%d", a.cfg.Host, a.cfg.Port)
