@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/crud-api"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/logger"
@@ -17,15 +18,17 @@ func main() {
 	defer stop()
 
 	environment.InitGlobal()
-	cfg, err := config.Load(ctx)
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
-
-	logrus.Warn(cfg)
 
 	logger.Init(cfg.Log)
 
-	logrus.Info("Application finished")
+	crudApi := crud_api.New(cfg.CrudApi)
+	if err = crudApi.Start(ctx); err != nil {
+		logrus.Fatal(err)
+	}
+
+	logrus.Info("Crud API Application finished")
 }

@@ -19,8 +19,16 @@ func Init(cfg config.LogConfig) {
 		rotatelogs.WithMaxAge(time.Duration(cfg.MaxAge)*24*time.Hour),
 	)
 
+	level, err := logrus.ParseLevel(cfg.Level)
+	if err != nil {
+		level = logrus.InfoLevel
+	}
+
+	logrus.SetLevel(level)
+
 	logrus.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
+			logrus.DebugLevel: fileWriter,
 			logrus.InfoLevel:  fileWriter,
 			logrus.WarnLevel:  fileWriter,
 			logrus.ErrorLevel: fileWriter,

@@ -26,7 +26,7 @@ type CrudApiConfig struct {
 	Port int    `config:"crudApi-port"`
 }
 
-func Load(ctx context.Context) (*Config, error) {
+func Load() (*Config, error) {
 	configPath := filepath.Join("configs", "app."+environment.Env+".json")
 
 	loader := confita.NewLoader(
@@ -46,7 +46,7 @@ func Load(ctx context.Context) (*Config, error) {
 		},
 	}
 
-	if err := loader.Load(ctx, cfg); err != nil {
+	if err := loader.Load(context.Background(), cfg); err != nil {
 		return nil, err
 	}
 

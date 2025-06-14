@@ -19,7 +19,7 @@ type UpdatedEntity struct {
 }
 
 type User struct {
-	UniqEntity
+	Id         UniqId `json:"id"`
 	SlackName  string `json:"slack_name"`
 	GithubName string `json:"github_name"`
 	Email      string `json:"email"`
