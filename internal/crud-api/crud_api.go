@@ -17,6 +17,7 @@ type store interface {
 	GetSettings() *db_adapter.Entity[*db.Setting]
 	GetDeployments() *db_adapter.Entity[*db.Deployment]
 	GetCodeReviews() *db_adapter.Entity[*db.CodeReview]
+	SaveChanges() error
 }
 
 type CrudApi struct {

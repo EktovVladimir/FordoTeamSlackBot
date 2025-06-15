@@ -17,8 +17,8 @@ func (a *CrudApi) Start(ctx context.Context) {
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      routes,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  time.Duration(a.cfg.ReadTimeoutSec) * time.Second,
+		WriteTimeout: time.Duration(a.cfg.WriteTimeoutSec) * time.Second,
 		BaseContext: func(net.Listener) context.Context {
 			return a.contextWithApi(ctx)
 		},

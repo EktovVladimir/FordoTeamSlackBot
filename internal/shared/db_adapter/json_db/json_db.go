@@ -154,6 +154,10 @@ func (s *store) SyncFilesWithLog() {
 	}
 }
 
+func (s *store) SaveChanges() error {
+	return s.SyncFiles()
+}
+
 func readFormFile[T any](storePath string, fileName string) ([]T, error) {
 	if err := os.MkdirAll(storePath, dirPerm); err != nil {
 		return nil, errors.Wrapf(err, "Error creating directory %s", storePath)

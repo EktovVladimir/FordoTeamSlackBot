@@ -6,7 +6,9 @@
   },
   "crudApi": {
     "host": "localhost",
-    "port": 8001
+    "port": 8001,
+    "readTimeoutSec": 300,
+    "writeTimeoutSec": 300
   },
   "jsonStore": {
     "path": "./data"
