@@ -31,7 +31,7 @@ type JsonStoreConfig struct {
 	Path string `config:"jsonStore-path"`
 }
 
-func Load() (*Config, error) {
+func Load() *Config {
 	configPath := filepath.Join("configs", "app."+environment.Env+".json")
 
 	loader := confita.NewLoader(
@@ -42,10 +42,11 @@ func Load() (*Config, error) {
 	cfg := getDefaultConfig()
 
 	if err := loader.Load(context.Background(), cfg); err != nil {
-		return nil, err
+		//Очень не ожидаем получить тут ошибку, но если получили, то совсем всё плохо
+		panic(err)
 	}
 
-	return cfg, nil
+	return cfg
 }
 
 func getDefaultConfig() *Config {

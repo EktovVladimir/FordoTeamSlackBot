@@ -115,33 +115,39 @@ func (s *store) SyncFiles() error {
 
 func (s *store) StartFileSync(ctx context.Context, interval time.Duration) {
 	go func() {
+		logrus.Info("File sync service started, waiting for initial delay...")
+
+		time.Sleep(interval)
+
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
 		for {
-			logrus.Debug("Starting file sync cycle")
-
 			select {
 			case <-ticker.C:
-				func() {
-					defer func() {
-						if err := recover(); err != nil {
-							logrus.Errorf("Panic during file sync: %v", err)
-						}
-					}()
-
-					if err := s.SyncFiles(); err != nil {
-						logrus.Errorf("Error syncing files: %v", err)
-					} else {
-						logrus.Debug("File sync completed successfully")
-					}
-				}()
+				s.SyncFilesWithLog()
 			case <-ctx.Done():
 				logrus.Infof("Stopping file sync. Reason: %v", ctx.Err())
 				return
 			}
 		}
 	}()
+}
+
+func (s *store) SyncFilesWithLog() {
+	logrus.Debug("Starting file sync cycle")
+
+	defer func() {
+		if err := recover(); err != nil {
+			logrus.Errorf("Panic during file sync: %v", err)
+		}
+	}()
+
+	if err := s.SyncFiles(); err != nil {
+		logrus.Errorf("Error syncing files: %v", err)
+	} else {
+		logrus.Debug("File sync completed successfully")
+	}
 }
 
 func readFormFile[T any](storePath string, fileName string) ([]T, error) {
