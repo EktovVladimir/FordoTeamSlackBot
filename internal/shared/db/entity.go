@@ -22,7 +22,7 @@ type Entity[T UniqEntity] struct {
 func NewEntity[T UniqEntity]() *Entity[T] {
 	return &Entity[T]{
 		mu:    &sync.RWMutex{},
-		items: make(map[UniqId]T, 0),
+		items: make(map[UniqId]T),
 		maxId: 0,
 	}
 }
@@ -41,6 +41,10 @@ func NewLoadedEntity[T UniqEntity](slice []T) *Entity[T] {
 func (ec *Entity[T]) GetAll() []T {
 	ec.mu.RLock()
 	defer ec.mu.RUnlock()
+
+	if len(ec.items) == 0 {
+		return make([]T, 0)
+	}
 
 	return slices.Collect(maps.Values(ec.items))
 }

@@ -18,6 +18,9 @@ const (
 	settingsFileName    = "settings.json"
 	deploymentsFileName = "deployments.json"
 	codeReviewsFileName = "code_reviews.json"
+
+	dirPerm  = 0755
+	filePerm = 0644
 )
 
 type store struct {
@@ -151,10 +154,14 @@ func (s *store) SyncFilesWithLog() {
 }
 
 func readFormFile[T any](storePath string, fileName string) ([]T, error) {
+	if err := os.MkdirAll(storePath, dirPerm); err != nil {
+		return nil, errors.Wrapf(err, "Error creating directory %s", storePath)
+	}
+
 	filePath := path.Join(storePath, fileName)
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		if err := os.WriteFile(filePath, []byte("[]"), 0644); err != nil {
+		if err := os.WriteFile(filePath, []byte("[]"), filePerm); err != nil {
 			return nil, errors.Wrapf(err, "Error creating file %s", filePath)
 		}
 		return make([]T, 0), nil
@@ -174,6 +181,10 @@ func readFormFile[T any](storePath string, fileName string) ([]T, error) {
 }
 
 func writeToFile[T any](storePath string, fileName string, data []T) error {
+	if err := os.MkdirAll(storePath, dirPerm); err != nil {
+		return errors.Wrapf(err, "Error creating directory %s", storePath)
+	}
+
 	filePath := path.Join(storePath, fileName)
 
 	bytes, err := json.MarshalIndent(data, "", "  ")
@@ -181,5 +192,5 @@ func writeToFile[T any](storePath string, fileName string, data []T) error {
 		return errors.Wrapf(err, "Error marshalling %s", fileName)
 	}
 
-	return os.WriteFile(filePath, bytes, 0644)
+	return os.WriteFile(filePath, bytes, filePerm)
 }
