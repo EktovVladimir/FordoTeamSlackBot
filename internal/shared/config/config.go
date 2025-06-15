@@ -11,9 +11,9 @@ import (
 )
 
 type Config struct {
-	Log       LogConfig       `config:"log"`
-	CrudApi   CrudApiConfig   `config:"crudApi"`
-	JsonStore JsonStoreConfig `config:"jsonStore"`
+	Log           LogConfig           `config:"log"`
+	ManagementApi ManagementApiConfig `config:"managementApi"`
+	JsonStore     JsonStoreConfig     `config:"jsonStore"`
 }
 
 type LogConfig struct {
@@ -22,11 +22,11 @@ type LogConfig struct {
 	MaxAge int    `config:"log-maxAge"`
 }
 
-type CrudApiConfig struct {
-	Host            string `config:"crudApi-host"`
-	Port            int    `config:"crudApi-port"`
-	ReadTimeoutSec  int    `config:"crudApi-readTimeoutSec"`
-	WriteTimeoutSec int    `config:"crudApi-writeTimeoutSec"`
+type ManagementApiConfig struct {
+	Host            string `config:"managementApi-host"`
+	Port            int    `config:"managementApi-port"`
+	ReadTimeoutSec  int    `config:"managementApi-readTimeoutSec"`
+	WriteTimeoutSec int    `config:"managementApi-writeTimeoutSec"`
 }
 
 type JsonStoreConfig struct {
@@ -58,7 +58,7 @@ func getDefaultConfig() *Config {
 			Dir:    "./logs",
 			MaxAge: 90,
 		},
-		CrudApi: CrudApiConfig{
+		ManagementApi: ManagementApiConfig{
 			Host:            "localhost",
 			Port:            8000,
 			ReadTimeoutSec:  60,

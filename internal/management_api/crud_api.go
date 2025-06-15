@@ -1,9 +1,9 @@
-package crud_api
+package management_api
 
 import (
 	"context"
 	"errors"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/crud-api/handlers/user"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/management_api/handlers/user"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
@@ -11,7 +11,7 @@ import (
 
 type contextKey string
 
-const apiContextKey contextKey = "crud_api"
+const apiContextKey contextKey = "management_api"
 
 type store interface {
 	GetUsers() *db_adapter.Entity[*db.User]
@@ -21,24 +21,24 @@ type store interface {
 	SaveChanges() error
 }
 
-type CrudApi struct {
-	cfg         config.CrudApiConfig
+type ManagementApi struct {
+	cfg         config.ManagementApiConfig
 	db          store
 	userHandler *user.Handler
 }
 
-func New(cfg config.CrudApiConfig, db store) *CrudApi {
-	return &CrudApi{
+func New(cfg config.ManagementApiConfig, db store) *ManagementApi {
+	return &ManagementApi{
 		cfg:         cfg,
 		db:          db,
 		userHandler: user.New(db)}
 }
 
 type requestContext struct {
-	api *CrudApi
+	api *ManagementApi
 }
 
-func (a *CrudApi) contextWithApi(ctx context.Context) context.Context {
+func (a *ManagementApi) contextWithApi(ctx context.Context) context.Context {
 	return context.WithValue(ctx, apiContextKey, &requestContext{a})
 }
 
@@ -47,5 +47,5 @@ func apiFromContext(ctx context.Context) (*requestContext, error) {
 	if rc, ok := val.(*requestContext); ok {
 		return rc, nil
 	}
-	return nil, errors.New("CrudApi not found in context")
+	return nil, errors.New("ManagementApi not found in context")
 }

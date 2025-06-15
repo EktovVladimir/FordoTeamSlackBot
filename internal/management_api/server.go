@@ -1,4 +1,4 @@
-package crud_api
+package management_api
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (a *CrudApi) Start(ctx context.Context) {
+func (a *ManagementApi) Start(ctx context.Context) {
 	routes := a.setupRoutes()
 	addr := fmt.Sprintf("%s:%d", a.cfg.Host, a.cfg.Port)
 
@@ -26,7 +26,7 @@ func (a *CrudApi) Start(ctx context.Context) {
 
 	serverErr := make(chan error, 1)
 	go func() {
-		logrus.Infof("Crud API starting on %s", addr)
+		logrus.Infof("Management API starting on %s", addr)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- fmt.Errorf("failed to start server: %w", err)
 		}
@@ -34,18 +34,18 @@ func (a *CrudApi) Start(ctx context.Context) {
 
 	select {
 	case err := <-serverErr:
-		logrus.Errorf("Crud API has error: %v", err)
+		logrus.Errorf("Management API has error: %v", err)
 	case <-ctx.Done():
-		logrus.Info("Crud API received shutdown signal")
+		logrus.Info("Management API received shutdown signal")
 	}
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		logrus.Errorf("Crud Api failed to shutdown server gracefully: %v", err)
+		logrus.Errorf("Management Api failed to shutdown server gracefully: %v", err)
 		return
 	}
 
-	logrus.Info("Crud Api server stopped gracefully")
+	logrus.Info("Management Api server stopped gracefully")
 }

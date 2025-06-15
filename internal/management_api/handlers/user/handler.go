@@ -23,12 +23,12 @@ func New(db store) *Handler {
 }
 
 func (c *Handler) SetupRoutes(router *mux.Router) {
-	usersRouter := router.PathPrefix("/users").Subrouter()
-	usersRouter.HandleFunc("", c.getUsers).Methods("GET")
-	usersRouter.HandleFunc("/{id}", c.getUser).Methods("GET")
-	usersRouter.HandleFunc("", c.createUser).Methods("POST")
-	usersRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
-	usersRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
+	sub := router.PathPrefix("/users").Subrouter()
+	sub.HandleFunc("", c.getUsers).Methods("GET")
+	sub.HandleFunc("/{id}", c.getUser).Methods("GET")
+	sub.HandleFunc("", c.createUser).Methods("POST")
+	sub.HandleFunc("/{id}", c.updateUser).Methods("PUT")
+	sub.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
 }
 
 func (c *Handler) getUsers(w http.ResponseWriter, _ *http.Request) {

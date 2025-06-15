@@ -1,4 +1,4 @@
-package crud_api
+package management_api
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func Run() *sync.WaitGroup {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	defer logrus.Info("Crud API Application finished")
+	defer logrus.Info("Management API Application finished")
 
 	environment.InitGlobal()
 	cfg := config.Load()
@@ -35,8 +35,8 @@ func Run() *sync.WaitGroup {
 
 	store.StartFileSync(ctx, 5*time.Minute)
 
-	crudApi := New(cfg.CrudApi, store)
-	crudApi.Start(ctx)
+	api := New(cfg.ManagementApi, store)
+	api.Start(ctx)
 
 	return wg
 }
