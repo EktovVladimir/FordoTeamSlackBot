@@ -2,7 +2,7 @@ package crud_api
 
 import (
 	"encoding/json"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )

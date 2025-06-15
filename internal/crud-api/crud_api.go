@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 )
 
 type contextKey string
@@ -12,10 +13,10 @@ type contextKey string
 const apiContextKey contextKey = "crud_api"
 
 type store interface {
-	GetUsers() *db.Entity[*db.User]
-	GetSettings() *db.Entity[*db.Setting]
-	GetDeployments() *db.Entity[*db.Deployment]
-	GetCodeReviews() *db.Entity[*db.CodeReview]
+	GetUsers() *db_adapter.Entity[*db.User]
+	GetSettings() *db_adapter.Entity[*db.Setting]
+	GetDeployments() *db_adapter.Entity[*db.Deployment]
+	GetCodeReviews() *db_adapter.Entity[*db.CodeReview]
 }
 
 type CrudApi struct {

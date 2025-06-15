@@ -3,7 +3,7 @@ package crud_api
 import (
 	"context"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db/json_db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter/json_db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/logger"
 	"github.com/sirupsen/logrus"

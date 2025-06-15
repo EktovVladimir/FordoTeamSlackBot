@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -25,36 +26,36 @@ const (
 
 type store struct {
 	cfg         config.JsonStoreConfig
-	Users       *db.Entity[*db.User]
-	Settings    *db.Entity[*db.Setting]
-	Deployments *db.Entity[*db.Deployment]
-	CodeReviews *db.Entity[*db.CodeReview]
+	Users       *db_adapter.Entity[*db.User]
+	Settings    *db_adapter.Entity[*db.Setting]
+	Deployments *db_adapter.Entity[*db.Deployment]
+	CodeReviews *db_adapter.Entity[*db.CodeReview]
 	mu          sync.Mutex
 }
 
 func NewStore(cfg config.JsonStoreConfig) *store {
 	return &store{
 		cfg:         cfg,
-		Users:       db.NewEntity[*db.User](),
-		Settings:    db.NewEntity[*db.Setting](),
-		Deployments: db.NewEntity[*db.Deployment](),
-		CodeReviews: db.NewEntity[*db.CodeReview](),
+		Users:       db_adapter.NewEntity[*db.User](),
+		Settings:    db_adapter.NewEntity[*db.Setting](),
+		Deployments: db_adapter.NewEntity[*db.Deployment](),
+		CodeReviews: db_adapter.NewEntity[*db.CodeReview](),
 	}
 }
 
-func (s *store) GetUsers() *db.Entity[*db.User] {
+func (s *store) GetUsers() *db_adapter.Entity[*db.User] {
 	return s.Users
 }
 
-func (s *store) GetSettings() *db.Entity[*db.Setting] {
+func (s *store) GetSettings() *db_adapter.Entity[*db.Setting] {
 	return s.Settings
 }
 
-func (s *store) GetDeployments() *db.Entity[*db.Deployment] {
+func (s *store) GetDeployments() *db_adapter.Entity[*db.Deployment] {
 	return s.Deployments
 }
 
-func (s *store) GetCodeReviews() *db.Entity[*db.CodeReview] {
+func (s *store) GetCodeReviews() *db_adapter.Entity[*db.CodeReview] {
 	return s.CodeReviews
 }
 
@@ -68,25 +69,25 @@ func (s *store) LoadFromFile() error {
 	if err != nil {
 		return err
 	}
-	s.Users = db.NewLoadedEntity(users)
+	s.Users = db_adapter.NewLoadedEntity(users)
 
 	settings, err := readFormFile[*db.Setting](path, settingsFileName)
 	if err != nil {
 		return err
 	}
-	s.Settings = db.NewLoadedEntity(settings)
+	s.Settings = db_adapter.NewLoadedEntity(settings)
 
 	deployments, err := readFormFile[*db.Deployment](path, deploymentsFileName)
 	if err != nil {
 		return err
 	}
-	s.Deployments = db.NewLoadedEntity(deployments)
+	s.Deployments = db_adapter.NewLoadedEntity(deployments)
 
 	codeReviews, err := readFormFile[*db.CodeReview](path, codeReviewsFileName)
 	if err != nil {
 		return err
 	}
-	s.CodeReviews = db.NewLoadedEntity(codeReviews)
+	s.CodeReviews = db_adapter.NewLoadedEntity(codeReviews)
 
 	return nil
 }

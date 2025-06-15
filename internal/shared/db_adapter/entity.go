@@ -1,28 +1,27 @@
-package db
+package db_adapter
 
 import (
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"maps"
 	"slices"
 	"sync"
 )
 
-type UniqId = int64
-
 type UniqEntity interface {
-	GetId() UniqId
-	SetId(id UniqId)
+	GetId() types.UniqId
+	SetId(id types.UniqId)
 }
 
 type Entity[T UniqEntity] struct {
 	mu    *sync.RWMutex
-	items map[UniqId]T
-	maxId UniqId
+	items map[types.UniqId]T
+	maxId types.UniqId
 }
 
 func NewEntity[T UniqEntity]() *Entity[T] {
 	return &Entity[T]{
 		mu:    &sync.RWMutex{},
-		items: make(map[UniqId]T),
+		items: make(map[types.UniqId]T),
 		maxId: 0,
 	}
 }
@@ -49,7 +48,7 @@ func (ec *Entity[T]) GetAll() []T {
 	return slices.Collect(maps.Values(ec.items))
 }
 
-func (ec *Entity[T]) Get(id UniqId) (T, bool) {
+func (ec *Entity[T]) Get(id types.UniqId) (T, bool) {
 	ec.mu.RLock()
 	defer ec.mu.RUnlock()
 
@@ -74,7 +73,7 @@ func (ec *Entity[T]) Update(item T) {
 	ec.items[id] = item
 }
 
-func (ec *Entity[T]) Delete(id UniqId) {
+func (ec *Entity[T]) Delete(id types.UniqId) {
 	ec.mu.Lock()
 	defer ec.mu.Unlock()
 
@@ -92,11 +91,11 @@ func (ec *Entity[T]) BulkInsert(items []T) {
 	}
 }
 
-func generateUniqId(oldId UniqId) UniqId {
+func generateUniqId(oldId types.UniqId) types.UniqId {
 	return oldId + 1
 }
 
-func maxUniqId(a UniqId, b UniqId) UniqId {
+func maxUniqId(a types.UniqId, b types.UniqId) types.UniqId {
 	if a > b {
 		return a
 	}
