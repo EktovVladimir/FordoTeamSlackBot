@@ -5,33 +5,24 @@ import (
 	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/management_api/handlers/user"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 )
 
 type contextKey string
 
 const apiContextKey contextKey = "management_api"
 
-type store interface {
-	GetUsers() *db_adapter.Entity[*db.User]
-	GetSettings() *db_adapter.Entity[*db.Setting]
-	GetDeployments() *db_adapter.Entity[*db.Deployment]
-	GetCodeReviews() *db_adapter.Entity[*db.CodeReview]
-	SaveChanges() error
-}
-
 type ManagementApi struct {
 	cfg         config.ManagementApiConfig
-	db          store
+	userRepo    repository.UserRepository
 	userHandler *user.Handler
 }
 
-func New(cfg config.ManagementApiConfig, db store) *ManagementApi {
+func New(cfg config.ManagementApiConfig, userRepo repository.UserRepository) *ManagementApi {
 	return &ManagementApi{
 		cfg:         cfg,
-		db:          db,
-		userHandler: user.New(db)}
+		userRepo:    userRepo,
+		userHandler: user.New(userRepo)}
 }
 
 type requestContext struct {

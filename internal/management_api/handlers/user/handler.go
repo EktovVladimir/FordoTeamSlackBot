@@ -1,25 +1,20 @@
 package user
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/helpers/api_helper"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/api"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
-type store interface {
-	GetUsers() *db_adapter.Entity[*db.User]
-	SaveChanges() error
-}
-
 type Handler struct {
-	db store
+	repo repository.UserRepository
 }
 
-func New(db store) *Handler {
-	return &Handler{db}
+func New(repo repository.UserRepository) *Handler {
+	return &Handler{repo}
 }
 
 func (c *Handler) SetupRoutes(router *mux.Router) {
@@ -31,8 +26,12 @@ func (c *Handler) SetupRoutes(router *mux.Router) {
 	sub.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
 }
 
-func (c *Handler) getUsers(w http.ResponseWriter, _ *http.Request) {
-	data := c.db.GetUsers().GetAll()
+func (c *Handler) getUsers(w http.ResponseWriter, r *http.Request) {
+	data, err := c.repo.GetAll(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	var respData []api.UserResponse
 	if err := api_helper.MapAndResponse(w, &data, &respData); err != nil {
@@ -42,17 +41,15 @@ func (c *Handler) getUsers(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Handler) getUser(w http.ResponseWriter, r *http.Request) {
-	entity := c.db.GetUsers()
-
 	id, err := api_helper.GetUniqIdFromRoute(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
-	data, found := entity.Get(id)
-	if !found {
-		http.Error(w, "User not found", http.StatusNotFound)
+	data, err := c.repo.GetById(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -71,10 +68,7 @@ func (c *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity := c.db.GetUsers()
-	entity.Insert(&dbModel)
-
-	if err := c.db.SaveChanges(); err != nil {
+	if err := c.repo.Create(r.Context(), &dbModel); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -99,10 +93,9 @@ func (c *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity := c.db.GetUsers()
-	dbModel, found := entity.Get(id)
-	if !found {
-		http.Error(w, "User not found", http.StatusNotFound)
+	dbModel, err := c.repo.GetById(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -111,9 +104,7 @@ func (c *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity.Update(dbModel)
-
-	if err := c.db.SaveChanges(); err != nil {
+	if err := c.repo.Update(r.Context(), dbModel); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -132,16 +123,13 @@ func (c *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity := c.db.GetUsers()
-	_, found := entity.Get(id)
-	if !found {
-		http.Error(w, "User not found", http.StatusNotFound)
+	_, err = c.repo.GetById(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	entity.Delete(id)
-
-	if err := c.db.SaveChanges(); err != nil {
+	if err := c.repo.Delete(r.Context(), id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

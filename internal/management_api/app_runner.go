@@ -6,6 +6,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter/json_db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/logger"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -35,7 +36,9 @@ func Run() *sync.WaitGroup {
 
 	store.StartFileSync(ctx, 5*time.Minute)
 
-	api := New(cfg.ManagementApi, store)
+	userRepo := repository.NewJsonUserRepository(store)
+
+	api := New(cfg.ManagementApi, userRepo)
 	api.Start(ctx)
 
 	return wg

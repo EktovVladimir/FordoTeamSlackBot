@@ -30,7 +30,7 @@ func NewLoadedEntity[T UniqEntity](slice []T) *Entity[T] {
 	entity := NewEntity[T]()
 
 	for _, e := range slice {
-		entity.maxId = maxUniqId(entity.maxId, e.GetId())
+		entity.maxId = MaxUniqId(entity.maxId, e.GetId())
 		entity.items[e.GetId()] = e
 	}
 
@@ -60,7 +60,7 @@ func (ec *Entity[T]) Insert(item T) {
 	ec.mu.Lock()
 	defer ec.mu.Unlock()
 
-	ec.maxId = generateUniqId(ec.maxId)
+	ec.maxId = GenerateUniqId(ec.maxId)
 	item.SetId(ec.maxId)
 	ec.items[ec.maxId] = item
 }
@@ -85,17 +85,17 @@ func (ec *Entity[T]) BulkInsert(items []T) {
 	defer ec.mu.Unlock()
 
 	for _, item := range items {
-		ec.maxId = generateUniqId(ec.maxId)
+		ec.maxId = GenerateUniqId(ec.maxId)
 		item.SetId(ec.maxId)
 		ec.items[ec.maxId] = item
 	}
 }
 
-func generateUniqId(oldId types.UniqId) types.UniqId {
+func GenerateUniqId(oldId types.UniqId) types.UniqId {
 	return oldId + 1
 }
 
-func maxUniqId(a types.UniqId, b types.UniqId) types.UniqId {
+func MaxUniqId(a types.UniqId, b types.UniqId) types.UniqId {
 	if a > b {
 		return a
 	}
