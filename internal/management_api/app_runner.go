@@ -36,9 +36,13 @@ func Run() *sync.WaitGroup {
 
 	store.StartFileSync(ctx, 5*time.Minute)
 
+	//TODO UoW
 	userRepo := repository.NewJsonUserRepository(store)
+	settingRepo := repository.NewJsonSettingRepository(store)
+	deploymentRepo := repository.NewJsonDeploymentRepository(store)
+	codeReviewRepo := repository.NewJsonCodeReviewRepository(store)
 
-	api := New(cfg.ManagementApi, userRepo)
+	api := New(cfg.ManagementApi, userRepo, settingRepo, deploymentRepo, codeReviewRepo)
 	api.Start(ctx)
 
 	return wg

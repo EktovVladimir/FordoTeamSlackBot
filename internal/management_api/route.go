@@ -13,6 +13,9 @@ func (a *ManagementApi) setupRoutes() *mux.Router {
 	apiRouter := r.PathPrefix("/management").Subrouter()
 
 	a.userHandler.SetupRoutes(apiRouter)
+	a.settingHandler.SetupRoutes(apiRouter)
+	a.deploymentsHandler.SetupRoutes(apiRouter)
+	a.codeReviewsHandler.SetupRoutes(apiRouter)
 
 	return r
 }

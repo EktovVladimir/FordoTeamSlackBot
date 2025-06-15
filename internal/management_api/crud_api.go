@@ -3,7 +3,7 @@ package management_api
 import (
 	"context"
 	"errors"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/management_api/handlers/user"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/management_api/handlers"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 )
@@ -13,16 +13,29 @@ type contextKey string
 const apiContextKey contextKey = "management_api"
 
 type ManagementApi struct {
-	cfg         config.ManagementApiConfig
-	userRepo    repository.UserRepository
-	userHandler *user.Handler
+	cfg                config.ManagementApiConfig
+	userRepo           repository.UserRepository
+	userHandler        *handlers.UserManagement
+	settingHandler     *handlers.SettingsManagement
+	deploymentsHandler *handlers.DeploymentsManagement
+	codeReviewsHandler *handlers.CodeReviewsManagement
 }
 
-func New(cfg config.ManagementApiConfig, userRepo repository.UserRepository) *ManagementApi {
+func New(
+	cfg config.ManagementApiConfig,
+	userRepo repository.UserRepository,
+	settingRepo repository.SettingsRepository,
+	deploymentRepo repository.DeploymentRepository,
+	codeReviewRepo repository.CodeReviewRepository) *ManagementApi {
+
 	return &ManagementApi{
-		cfg:         cfg,
-		userRepo:    userRepo,
-		userHandler: user.New(userRepo)}
+		cfg:                cfg,
+		userRepo:           userRepo,
+		userHandler:        handlers.NewUserManagement(userRepo),
+		settingHandler:     handlers.NewSettingsManagement(settingRepo),
+		deploymentsHandler: handlers.NewDeploymentsManagement(deploymentRepo),
+		codeReviewsHandler: handlers.NewCodeReviewsManagement(codeReviewRepo),
+	}
 }
 
 type requestContext struct {
