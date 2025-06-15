@@ -1,14 +1,38 @@
-package crud_api
+package user
 
 import (
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/helpers/api_helper"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/api"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
-func (a *CrudApi) getUsers(w http.ResponseWriter, _ *http.Request) {
-	data := a.db.GetUsers().GetAll()
+type store interface {
+	GetUsers() *db_adapter.Entity[*db.User]
+	SaveChanges() error
+}
+
+type Handler struct {
+	db store
+}
+
+func New(db store) *Handler {
+	return &Handler{db}
+}
+
+func (c *Handler) SetupRoutes(router *mux.Router) {
+	usersRouter := router.PathPrefix("/users").Subrouter()
+	usersRouter.HandleFunc("", c.getUsers).Methods("GET")
+	usersRouter.HandleFunc("/{id}", c.getUser).Methods("GET")
+	usersRouter.HandleFunc("", c.createUser).Methods("POST")
+	usersRouter.HandleFunc("/{id}", c.updateUser).Methods("PUT")
+	usersRouter.HandleFunc("/{id}", c.deleteUser).Methods("DELETE")
+}
+
+func (c *Handler) getUsers(w http.ResponseWriter, _ *http.Request) {
+	data := c.db.GetUsers().GetAll()
 
 	var respData []api.UserResponse
 	if err := api_helper.MapAndResponse(w, &data, &respData); err != nil {
@@ -17,8 +41,8 @@ func (a *CrudApi) getUsers(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func (a *CrudApi) getUser(w http.ResponseWriter, r *http.Request) {
-	entity := a.db.GetUsers()
+func (c *Handler) getUser(w http.ResponseWriter, r *http.Request) {
+	entity := c.db.GetUsers()
 
 	id, err := api_helper.GetUniqIdFromRoute(r)
 	if err != nil {
@@ -39,7 +63,7 @@ func (a *CrudApi) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *CrudApi) createUser(w http.ResponseWriter, r *http.Request) {
+func (c *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 	var req api.CreateUserRequest
 	var dbModel db.User
 	if err := api_helper.ValidateAndMapRequest(r.Body, &req, &dbModel); err != nil {
@@ -47,10 +71,10 @@ func (a *CrudApi) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity := a.db.GetUsers()
+	entity := c.db.GetUsers()
 	entity.Insert(&dbModel)
 
-	if err := a.db.SaveChanges(); err != nil {
+	if err := c.db.SaveChanges(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -62,7 +86,7 @@ func (a *CrudApi) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *CrudApi) updateUser(w http.ResponseWriter, r *http.Request) {
+func (c *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := api_helper.GetUniqIdFromRoute(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
@@ -75,7 +99,7 @@ func (a *CrudApi) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entity := a.db.GetUsers()
+	entity := c.db.GetUsers()
 	dbModel, found := entity.Get(id)
 	if !found {
 		http.Error(w, "User not found", http.StatusNotFound)
@@ -89,7 +113,7 @@ func (a *CrudApi) updateUser(w http.ResponseWriter, r *http.Request) {
 
 	entity.Update(dbModel)
 
-	if err := a.db.SaveChanges(); err != nil {
+	if err := c.db.SaveChanges(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -101,14 +125,14 @@ func (a *CrudApi) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *CrudApi) deleteUser(w http.ResponseWriter, r *http.Request) {
+func (c *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := api_helper.GetUniqIdFromRoute(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
-	entity := a.db.GetUsers()
+	entity := c.db.GetUsers()
 	_, found := entity.Get(id)
 	if !found {
 		http.Error(w, "User not found", http.StatusNotFound)
@@ -117,7 +141,7 @@ func (a *CrudApi) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	entity.Delete(id)
 
-	if err := a.db.SaveChanges(); err != nil {
+	if err := c.db.SaveChanges(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

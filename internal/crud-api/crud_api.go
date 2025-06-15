@@ -3,6 +3,7 @@ package crud_api
 import (
 	"context"
 	"errors"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/crud-api/handlers/user"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
@@ -21,12 +22,16 @@ type store interface {
 }
 
 type CrudApi struct {
-	cfg config.CrudApiConfig
-	db  store
+	cfg         config.CrudApiConfig
+	db          store
+	userHandler *user.Handler
 }
 
 func New(cfg config.CrudApiConfig, db store) *CrudApi {
-	return &CrudApi{cfg, db}
+	return &CrudApi{
+		cfg:         cfg,
+		db:          db,
+		userHandler: user.New(db)}
 }
 
 type requestContext struct {
