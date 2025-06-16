@@ -18,7 +18,7 @@ func NewCodeReviewsManagement(repo repository.CodeReviewRepository) *CodeReviews
 }
 
 func (h *CodeReviewsManagement) SetupRoutes(router *mux.Router) {
-	sub := router.PathPrefix("/settings").Subrouter()
+	sub := router.PathPrefix("/reviews").Subrouter()
 	sub.HandleFunc("", h.getCodeReviews).Methods("GET")
 	sub.HandleFunc("/{id}", h.getCodeReview).Methods("GET")
 	sub.HandleFunc("", h.createCodeReview).Methods("POST")

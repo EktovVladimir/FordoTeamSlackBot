@@ -18,7 +18,7 @@ func NewDeploymentsManagement(repo repository.DeploymentRepository) *Deployments
 }
 
 func (h *DeploymentsManagement) SetupRoutes(router *mux.Router) {
-	sub := router.PathPrefix("/settings").Subrouter()
+	sub := router.PathPrefix("/deployments").Subrouter()
 	sub.HandleFunc("", h.getDeployments).Methods("GET")
 	sub.HandleFunc("/{id}", h.getDeployment).Methods("GET")
 	sub.HandleFunc("", h.createDeployment).Methods("POST")
