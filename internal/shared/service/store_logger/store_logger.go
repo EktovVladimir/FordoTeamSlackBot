@@ -3,17 +3,17 @@ package store_logger
 import (
 	"context"
 	"fmt"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 )
 
 type dataStore interface {
-	GetUsers() []*db_adapter.User
-	GetSettings() []*db_adapter.Setting
-	GetDeployments() []*db_adapter.Deployment
-	GetCodeReviews() []*db_adapter.CodeReview
+	GetUsers() []*db.User
+	GetSettings() []*db.Setting
+	GetDeployments() []*db.Deployment
+	GetCodeReviews() []*db.CodeReview
 }
 
 type storeLogger struct {
@@ -30,10 +30,10 @@ type scanPosition struct {
 }
 
 type scanSlices struct {
-	users       []*db_adapter.User
-	settings    []*db_adapter.Setting
-	deployments []*db_adapter.Deployment
-	codeReviews []*db_adapter.CodeReview
+	users       []*db.User
+	settings    []*db.Setting
+	deployments []*db.Deployment
+	codeReviews []*db.CodeReview
 }
 
 func NewStoreLogger(store dataStore, interval time.Duration) *storeLogger {
