@@ -1,0 +1,16 @@
+{
+  "log": {
+    "level": "debug",
+    "dir": "./logs",
+    "maxAge": 10
+  },
+  "managementApi": {
+    "host": "localhost",
+    "port": 8080,
+    "readTimeoutSec": 300,
+    "writeTimeoutSec": 300
+  },
+  "jsonStore": {
+    "path": "./data"
+  }
+}

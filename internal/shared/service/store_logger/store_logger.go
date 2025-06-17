@@ -3,7 +3,7 @@ package store_logger
 import (
 	"context"
 	"fmt"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
