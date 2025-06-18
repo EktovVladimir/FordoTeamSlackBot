@@ -4,7 +4,7 @@
     "dir": "./logs",
     "maxAge": 10
   },
-  "managementApi": {
+  "server": {
     "host": "localhost",
     "port": 8080,
     "readTimeoutSec": 300,

@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/heetch/confita"
 	"github.com/heetch/confita/backend/env"
@@ -11,9 +12,9 @@ import (
 )
 
 type Config struct {
-	Log           LogConfig           `config:"log"`
-	ManagementApi ManagementApiConfig `config:"managementApi"`
-	JsonStore     JsonStoreConfig     `config:"jsonStore"`
+	Log       LogConfig       `config:"log"`
+	Server    ServerConfig    `config:"server"`
+	JsonStore JsonStoreConfig `config:"jsonStore"`
 }
 
 type LogConfig struct {
@@ -22,19 +23,19 @@ type LogConfig struct {
 	MaxAge int    `config:"log-maxAge"`
 }
 
-type ManagementApiConfig struct {
-	Host            string `config:"managementApi-host"`
-	Port            int    `config:"managementApi-port"`
-	ReadTimeoutSec  int    `config:"managementApi-readTimeoutSec"`
-	WriteTimeoutSec int    `config:"managementApi-writeTimeoutSec"`
+type ServerConfig struct {
+	Host            string `config:"server-host"`
+	Port            int    `config:"server-port"`
+	ReadTimeoutSec  int    `config:"server-readTimeoutSec"`
+	WriteTimeoutSec int    `config:"server-writeTimeoutSec"`
 }
 
 type JsonStoreConfig struct {
 	Path string `config:"jsonStore-path"`
 }
 
-func Load() *Config {
-	configPath := filepath.Join("configs", "app."+environment.Env+".json")
+func Load(appName string) *Config {
+	configPath := filepath.Join("configs", fmt.Sprintf("%s.%s.json", appName, environment.Env))
 
 	loader := confita.NewLoader(
 		file.NewBackend(configPath),
@@ -58,7 +59,7 @@ func getDefaultConfig() *Config {
 			Dir:    "./logs",
 			MaxAge: 90,
 		},
-		ManagementApi: ManagementApiConfig{
+		Server: ServerConfig{
 			Host:            "localhost",
 			Port:            8000,
 			ReadTimeoutSec:  60,

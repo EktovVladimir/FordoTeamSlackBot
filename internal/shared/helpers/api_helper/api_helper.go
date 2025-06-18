@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/api"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
-	"io"
 	"net/http"
 	"strconv"
 )
 
-func MapAndResponse[TModel any, TResponse any](w http.ResponseWriter, model *TModel, responseModel *TResponse) error {
+func MapAndResponse[TModel any, TResponse any](c *gin.Context, model *TModel, responseModel *TResponse) error {
 	if err := copier.Copy(responseModel, model); err != nil {
 		return err
 	}
@@ -22,19 +21,14 @@ func MapAndResponse[TModel any, TResponse any](w http.ResponseWriter, model *TMo
 		Error: nil,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		return err
-	}
-
+	c.JSON(http.StatusOK, resp)
 	return nil
 }
 
-func ValidateRequest[TRequest any](body io.Reader, requestData *TRequest) error {
+func ValidateRequest[TRequest any](c *gin.Context, requestData *TRequest) error {
 	var validate = validator.New()
 
-	decoder := json.NewDecoder(body)
+	decoder := json.NewDecoder(c.Request.Body)
 	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(requestData); err != nil {
@@ -48,8 +42,8 @@ func ValidateRequest[TRequest any](body io.Reader, requestData *TRequest) error 
 	return nil
 }
 
-func ValidateAndMapRequest[TRequest any, TModel any](body io.Reader, requestData *TRequest, model *TModel) error {
-	if err := ValidateRequest(body, requestData); err != nil {
+func ValidateAndMapRequest[TRequest any, TModel any](c *gin.Context, requestData *TRequest, model *TModel) error {
+	if err := ValidateRequest(c, requestData); err != nil {
 		return err
 	}
 
@@ -67,9 +61,8 @@ func MapIgnoreEmpty[T1 any, T2 any](from *T1, to *T2) error {
 		})
 }
 
-func GetUniqIdFromRoute(r *http.Request) (types.UniqId, error) {
-	vars := mux.Vars(r)
-	idStr := vars["id"]
+func GetUniqIdFromRoute(c *gin.Context) (types.UniqId, error) {
+	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || id <= 0 {
 		return 0, err

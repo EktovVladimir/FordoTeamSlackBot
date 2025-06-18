@@ -1,6 +1,4 @@
-package api
-
-import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+package code_review_handler
 
 type CreateCodeReviewRequest struct {
 	ThreadTs          string `json:"thread_ts" validate:"required"`
@@ -12,11 +10,4 @@ type UpdateCodeReviewRequest struct {
 	ThreadTs          *string `json:"thread_ts" validate:"omitempty"`
 	PullRequestNumber *string `json:"pull_request_number" validate:"omitempty,numeric"`
 	Status            *string `json:"status" validate:"omitempty,oneof=pending approved rejected"`
-}
-
-type CodeReviewResponse struct {
-	Id                types.UniqId `json:"id"`
-	ThreadTs          string       `json:"thread_ts"`
-	PullRequestNumber string       `json:"pull_request_number"`
-	Status            string       `json:"status"`
 }

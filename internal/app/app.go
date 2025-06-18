@@ -1,32 +1,29 @@
-package management_api
+package app
 
 import (
 	"context"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter/json_db"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/logger"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 	"github.com/sirupsen/logrus"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 )
 
-func Run() *sync.WaitGroup {
+type app struct {
+	cfg     *config.Config
+	appName string
+}
+
+func New(cfg *config.Config, appName string) *app {
+	return &app{cfg: cfg, appName: appName}
+}
+
+func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	defer logrus.Info("Management API Application finished")
-
-	environment.InitGlobal()
-	cfg := config.Load()
-	logger.Init(cfg.Log)
-
-	store := json_db.NewStore(cfg.JsonStore)
+	store := json_db.NewStore(app.cfg.JsonStore)
 	if err := store.LoadFromFile(); err != nil {
 		logrus.Errorf("Error loading json data files: %v", err)
 		return wg
@@ -42,8 +39,13 @@ func Run() *sync.WaitGroup {
 	deploymentRepo := repository.NewJsonDeploymentRepository(store)
 	codeReviewRepo := repository.NewJsonCodeReviewRepository(store)
 
-	api := New(cfg.ManagementApi, userRepo, settingRepo, deploymentRepo, codeReviewRepo)
-	api.Start(ctx)
+	managementHandler := management_handler.New(app.cfg.Server, userRepo, settingRepo, deploymentRepo, codeReviewRepo)
+
+	srv := newServer(
+		app,
+		managementHandler)
+
+	srv.Start(ctx)
 
 	return wg
 }
