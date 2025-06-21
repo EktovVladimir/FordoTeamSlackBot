@@ -1,72 +1,73 @@
 package config
 
 import (
-	"context"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
-	"github.com/heetch/confita"
-	"github.com/heetch/confita/backend/env"
-	"github.com/heetch/confita/backend/file"
-	"github.com/heetch/confita/backend/flags"
+	"github.com/spf13/viper"
+	"os"
 	"path/filepath"
+	"time"
 )
 
 type Config struct {
-	Log       LogConfig       `config:"log"`
-	Server    ServerConfig    `config:"server"`
-	JsonStore JsonStoreConfig `config:"jsonStore"`
+	Log       LogConfig       `mapstructure:"log"`
+	Server    ServerConfig    `mapstructure:"server"`
+	JsonStore JsonStoreConfig `mapstructure:"jsonStore"`
 }
 
 type LogConfig struct {
-	Level  string `config:"log-level"`
-	Dir    string `config:"log-dir"`
-	MaxAge int    `config:"log-maxAge"`
+	Level  string `mapstructure:"level"`
+	Dir    string `mapstructure:"dir"`
+	MaxAge int    `mapstructure:"maxAge"`
 }
 
 type ServerConfig struct {
-	Host            string `config:"server-host"`
-	Port            int    `config:"server-port"`
-	ReadTimeoutSec  int    `config:"server-readTimeoutSec"`
-	WriteTimeoutSec int    `config:"server-writeTimeoutSec"`
+	Host         string        `mapstructure:"host"`
+	Port         int           `mapstructure:"port"`
+	ReadTimeout  time.Duration `mapstructure:"readTimeout"`
+	WriteTimeout time.Duration `mapstructure:"writeTimeout"`
 }
 
 type JsonStoreConfig struct {
-	Path string `config:"jsonStore-path"`
+	Path string `mapstructure:"path"`
 }
 
 func Load(appName string) *Config {
 	configPath := filepath.Join("configs", fmt.Sprintf("%s.%s.json", appName, environment.Env))
 
-	loader := confita.NewLoader(
-		file.NewBackend(configPath),
-		flags.NewBackend(),
-		env.NewBackend())
+	setDefaults()
 
-	cfg := getDefaultConfig()
+	viper.SetConfigFile(configPath)
+	viper.SetConfigType("json")
+	viper.AutomaticEnv()
 
-	if err := loader.Load(context.Background(), cfg); err != nil {
-		//Очень не ожидаем получить тут ошибку, но если получили, то совсем всё плохо
-		panic(err)
+	viper.ReadInConfig()
+
+	if err := viper.ReadInConfig(); err != nil {
+		if !os.IsNotExist(err) {
+			panic(fmt.Errorf("fatal error reading config file: %w", err))
+		}
 	}
 
-	return cfg
+	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
+		panic(fmt.Errorf("fatal error unmarshaling config: %w", err))
+	}
+
+	fmt.Println(cfg)
+
+	return &cfg
 }
 
-func getDefaultConfig() *Config {
-	return &Config{
-		Log: LogConfig{
-			Level:  "info",
-			Dir:    "./logs",
-			MaxAge: 90,
-		},
-		Server: ServerConfig{
-			Host:            "localhost",
-			Port:            8000,
-			ReadTimeoutSec:  60,
-			WriteTimeoutSec: 60,
-		},
-		JsonStore: JsonStoreConfig{
-			Path: "./data",
-		},
-	}
+func setDefaults() {
+	viper.SetDefault("log.level", "debug")
+	viper.SetDefault("log.dir", "./logs")
+	viper.SetDefault("log.maxAge", 90)
+
+	viper.SetDefault("server.host", "localhost")
+	viper.SetDefault("server.port", 8000)
+	viper.SetDefault("server.readTimeout", "60s")
+	viper.SetDefault("server.writeTimeout", "60s")
+
+	viper.SetDefault("jsonStore.path", "./data")
 }

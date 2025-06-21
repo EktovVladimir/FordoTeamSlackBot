@@ -46,8 +46,8 @@ func (s *server) Start(ctx context.Context) {
 	httpServer := &http.Server{
 		Addr:         addr,
 		Handler:      router,
-		ReadTimeout:  time.Duration(serverConf.ReadTimeoutSec) * time.Second,
-		WriteTimeout: time.Duration(serverConf.WriteTimeoutSec) * time.Second,
+		ReadTimeout:  serverConf.ReadTimeout,
+		WriteTimeout: serverConf.WriteTimeout,
 	}
 
 	serverErr := make(chan error, 1)
