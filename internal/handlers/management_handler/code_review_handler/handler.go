@@ -20,10 +20,10 @@ func New(repo repository.CodeReviewRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/reviews")
 	group.GET("", h.getCodeReviews)
-	group.GET("/{id}", h.getCodeReview)
+	group.GET("/:id", h.getCodeReview)
 	group.POST("", h.createCodeReview)
-	group.PUT("/{id}", h.updateCodeReview)
-	group.DELETE("/{id}", h.deleteCodeReview)
+	group.PUT("/:id}", h.updateCodeReview)
+	group.DELETE("/:id", h.deleteCodeReview)
 }
 
 func (h *Handler) getCodeReviews(c *gin.Context) {

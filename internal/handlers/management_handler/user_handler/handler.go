@@ -20,10 +20,10 @@ func New(repo repository.UserRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/users")
 	group.GET("", h.getUsers)
-	group.GET("/{id}", h.getUser)
+	group.GET("/:id", h.getUser)
 	group.POST("", h.createUser)
-	group.PUT("/{id}", h.updateUser)
-	group.DELETE("/{id}", h.deleteUser)
+	group.PUT("/:id", h.updateUser)
+	group.DELETE("/:id", h.deleteUser)
 }
 
 func (h *Handler) getUsers(c *gin.Context) {

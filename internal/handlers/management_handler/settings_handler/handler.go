@@ -20,10 +20,10 @@ func New(repo repository.SettingsRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/settings")
 	group.GET("", h.getSettings)
-	group.GET("/{id}", h.getSetting)
+	group.GET("/:id", h.getSetting)
 	group.POST("", h.createSetting)
-	group.PUT("/{id}", h.updateSetting)
-	group.DELETE("/{id}", h.deleteSetting)
+	group.PUT("/:id", h.updateSetting)
+	group.DELETE("/:id", h.deleteSetting)
 }
 
 func (h *Handler) getSettings(c *gin.Context) {

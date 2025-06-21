@@ -20,10 +20,10 @@ func New(repo repository.DeploymentRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/deployments")
 	group.GET("", h.getDeployments)
-	group.GET("/{id}", h.getDeployment)
+	group.GET("/:id", h.getDeployment)
 	group.POST("", h.createDeployment)
-	group.PUT("/{id}", h.updateDeployment)
-	group.DELETE("/{id}", h.deleteDeployment)
+	group.PUT("/:id", h.updateDeployment)
+	group.DELETE("/:id", h.deleteDeployment)
 }
 
 func (h *Handler) getDeployments(c *gin.Context) {
