@@ -1,13 +1,23 @@
 package user_handler
 
+// CreateUserRequest model
+// @Description Запрос на создание пользователя
 type CreateUserRequest struct {
-	SlackName  string `json:"slack_name" validate:"required,min=2"`
+	// @Description Имя пользователя Slack
+	SlackName string `json:"slack_name" validate:"required,min=2"`
+	// @Description Имя пользователя в Github
 	GithubName string `json:"github_name" validate:"omitempty,min=2"`
-	Email      string `json:"email" validate:"required,email"`
+	// @Description Рабочий email
+	Email string `json:"email" validate:"required,email"`
 }
 
+// UpdateUserRequest model
+// @Description Запрос на изменение пользователя
 type UpdateUserRequest struct {
-	SlackName  *string `json:"slack_name" validate:"omitempty,min=2"`
+	// @Description Имя пользователя Slack
+	SlackName *string `json:"slack_name" validate:"omitempty,min=2"`
+	// @Description Имя пользователя в Github
 	GithubName *string `json:"github_name" validate:"omitempty,min=2"`
-	Email      *string `json:"email" validate:"omitempty,email"`
+	// @Description Рабочий email
+	Email *string `json:"email" validate:"omitempty,email"`
 }

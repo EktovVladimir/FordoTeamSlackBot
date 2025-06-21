@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/EktovVladimir/FordoTeamSlackBot/docs"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/middlewares"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 	"time"
 )
@@ -36,6 +39,12 @@ func (s *server) Start(ctx context.Context) {
 
 	router := gin.New()
 
+	serverConf := s.app.cfg.Server
+	addr := fmt.Sprintf("%s:%d", serverConf.Host, serverConf.Port)
+
+	docs.SwaggerInfo.Host = addr
+	router.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	router.Use(gin.Recovery())
 
 	authGr := router.Group("/auth")
@@ -46,9 +55,6 @@ func (s *server) Start(ctx context.Context) {
 
 	managementGr := router.Group("/management")
 	s.managementHandler.SetupRoutes(ctx, managementGr)
-
-	serverConf := s.app.cfg.Server
-	addr := fmt.Sprintf("%s:%d", serverConf.Host, serverConf.Port)
 
 	httpServer := &http.Server{
 		Addr:         addr,

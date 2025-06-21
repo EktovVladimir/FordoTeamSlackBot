@@ -26,6 +26,13 @@ func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group.DELETE("/:id", h.deleteDeployment)
 }
 
+// @Summary	Получить список всех деплоев
+// @Tags		deployments
+// @Security	BearerAuth
+// @Produce	json
+// @Success	200	{object}	api.Response[[]DeploymentResponse]
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/deployments [get]
 func (h *Handler) getDeployments(c *gin.Context) {
 	data, err := h.repo.GetAll(c.Request.Context())
 	if err != nil {
@@ -40,6 +47,16 @@ func (h *Handler) getDeployments(c *gin.Context) {
 	}
 }
 
+// @Summary	Получить информацию о деплое
+// @Tags		deployments
+// @Security	BearerAuth
+// @Produce	json
+// @Param		id	path		int	true	"ID деплоя"
+// @Success	200	{object}	api.Response[DeploymentResponse]
+// @Failure	422	{object}	api.Response[any]	"Ошибка валидации ID"
+// @Failure	404	{object}	api.Response[any]	"Деплой не найден"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/deployments/{id} [get]
 func (h *Handler) getDeployment(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -60,6 +77,16 @@ func (h *Handler) getDeployment(c *gin.Context) {
 	}
 }
 
+// @Summary	Создать новый деплой
+// @Tags		deployments
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		request	body		CreateDeploymentRequest	true	"Данные деплоя"
+// @Success	200		{object}	api.Response[DeploymentResponse]
+// @Failure	422		{object}	api.Response[any]	"Ошибка валидации"
+// @Failure	500		{object}	api.Response[any]
+// @Router		/management/deployments [post]
 func (h *Handler) createDeployment(c *gin.Context) {
 	var req CreateDeploymentRequest
 	var dbModel db.Deployment
@@ -80,6 +107,18 @@ func (h *Handler) createDeployment(c *gin.Context) {
 	}
 }
 
+// @Summary	Обновить информацию о деплое
+// @Tags		deployments
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		id		path		int						true	"ID деплоя"
+// @Param		request	body		UpdateDeploymentRequest	true	"Новые данные деплоя"
+// @Success	200		{object}	api.Response[DeploymentResponse]
+// @Failure	422		{object}	api.Response[any]	"Ошибка валидации"
+// @Failure	404		{object}	api.Response[any]	"Деплой не найден"
+// @Failure	500		{object}	api.Response[any]
+// @Router		/management/deployments/{id} [put]
 func (h *Handler) updateDeployment(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -116,6 +155,16 @@ func (h *Handler) updateDeployment(c *gin.Context) {
 	}
 }
 
+// @Summary	Удалить деплой
+// @Tags		deployments
+// @Security	BearerAuth
+// @Produce	json
+// @Param		id	path	int	true	"ID деплоя"
+// @Success	204
+// @Failure	422	{object}	api.Response[any]	"Ошибка валидации ID"
+// @Failure	404	{object}	api.Response[any]	"Деплой не найден"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/deployments/{id} [delete]
 func (h *Handler) deleteDeployment(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {

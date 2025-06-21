@@ -60,8 +60,6 @@ func Load(appName string) *Config {
 		panic(fmt.Errorf("fatal error unmarshaling config: %w", err))
 	}
 
-	fmt.Println(cfg)
-
 	return &cfg
 }
 

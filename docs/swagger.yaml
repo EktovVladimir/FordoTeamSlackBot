@@ -1,0 +1,971 @@
+definitions:
+  api.Error:
+    description: Модель ошибки на запрос
+    properties:
+      message:
+        description: Текст ошибки
+        type: string
+    type: object
+  api.Response-any:
+    properties:
+      data:
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-array_code_review_handler_CodeReviewResponse:
+    properties:
+      data:
+        description: Данные
+        items:
+          $ref: '#/definitions/code_review_handler.CodeReviewResponse'
+        type: array
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-array_deployment_handler_DeploymentResponse:
+    properties:
+      data:
+        description: Данные
+        items:
+          $ref: '#/definitions/deployment_handler.DeploymentResponse'
+        type: array
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-array_settings_handler_SettingResponse:
+    properties:
+      data:
+        description: Данные
+        items:
+          $ref: '#/definitions/settings_handler.SettingResponse'
+        type: array
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-array_user_handler_UserResponse:
+    properties:
+      data:
+        description: Данные
+        items:
+          $ref: '#/definitions/user_handler.UserResponse'
+        type: array
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-auth_handler_TokenResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/auth_handler.TokenResponse'
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-code_review_handler_CodeReviewResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/code_review_handler.CodeReviewResponse'
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-deployment_handler_DeploymentResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/deployment_handler.DeploymentResponse'
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-settings_handler_SettingResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/settings_handler.SettingResponse'
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  api.Response-user_handler_UserResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/user_handler.UserResponse'
+        description: Данные
+      error:
+        allOf:
+        - $ref: '#/definitions/api.Error'
+        description: Ошибка
+    type: object
+  auth_handler.TokenRequest:
+    description: запрос на генерацию токена
+    properties:
+      password:
+        description: '@Description Пароль'
+        type: string
+      username:
+        description: '@Description Имя пользователя'
+        type: string
+    type: object
+  auth_handler.TokenResponse:
+    description: Модель со сгенерированным токеном
+    properties:
+      token:
+        description: '@Description токен'
+        type: string
+    type: object
+  code_review_handler.CodeReviewResponse:
+    description: Информация о процессе код-ревью
+    properties:
+      id:
+        description: "@Description\tУникальный ID\n\t@Example:\t\t1"
+        type: integer
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\""
+        type: string
+      status:
+        description: "@Description\tСтатус код-ревью\n\t@Example:\t\t\"approved\"\n\t@Enum\t\t\tpending,approved,rejected"
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\""
+        type: string
+    type: object
+  code_review_handler.CreateCodeReviewRequest:
+    description: Запрос на создание код-ревью
+    properties:
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\"\n\t@Required\t\ttrue"
+        type: string
+      status:
+        description: "@Description\tСтатус код-ревью\n\t@Example:\t\t\"pending\"\n\t@Enum\t\t\tpending,approved,rejected\n\t@Required\t\ttrue"
+        enum:
+        - pending
+        - approved
+        - rejected
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\"\n\t@Required\t\ttrue"
+        type: string
+    required:
+    - pull_request_number
+    - status
+    - thread_ts
+    type: object
+  code_review_handler.UpdateCodeReviewRequest:
+    description: Запрос на обновление код-ревью
+    properties:
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\""
+        type: string
+      status:
+        description: "@Description\tСтатус код-ревью\n\t@Example:\t\t\"approved\"\n\t@Enum\t\t\tpending,approved,rejected"
+        enum:
+        - pending
+        - approved
+        - rejected
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\""
+        type: string
+    type: object
+  deployment_handler.CreateDeploymentRequest:
+    description: Запрос на создание деплоя
+    properties:
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t42\n\t@Required\t\ttrue"
+        type: string
+      status:
+        description: "@Description\tСтатус деплоя\n\t@Example:\t\tpending\n\t@Enum\t\t\tpending,success,failed,running\n\t@Required\t\ttrue"
+        enum:
+        - pending
+        - success
+        - failed
+        - running
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456\n\t@Required\t\ttrue"
+        type: string
+      workflow_run_id:
+        description: "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321"
+        type: string
+    required:
+    - pull_request_number
+    - status
+    - thread_ts
+    type: object
+  deployment_handler.DeploymentResponse:
+    description: Информация о процессе деплоя
+    properties:
+      id:
+        description: "@Description\tУникальный ID деплоя\n\t@Example:\t\t1"
+        type: integer
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t42"
+        type: string
+      status:
+        description: "@Description\tСтатус деплоя\n\t@Example:\t\tsuccess\n\t@Enum\t\t\tpending,success,failed,running"
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456"
+        type: string
+      workflow_run_id:
+        description: "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321"
+        type: string
+    type: object
+  deployment_handler.UpdateDeploymentRequest:
+    description: Запрос на обновление деплоя
+    properties:
+      pull_request_number:
+        description: "@Description\tНомер Pull Request\n\t@Example:\t\t42"
+        type: string
+      status:
+        description: "@Description\tСтатус деплоя\n\t@Example:\t\tsuccess\n\t@Enum\t\t\tpending,success,failed,running"
+        enum:
+        - pending
+        - success
+        - failed
+        - running
+        type: string
+      thread_ts:
+        description: "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456"
+        type: string
+      workflow_run_id:
+        description: "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321"
+        type: string
+    type: object
+  settings_handler.CreateSettingRequest:
+    description: Запрос на создание настройки
+    properties:
+      key:
+        description: "@Description\tУникальный ключ настройки\n\t@Required\t\ttrue"
+        minLength: 1
+        type: string
+      value:
+        description: "@Description\tЗначение настройки\n\t@Example:\t\t10485760\n\t@Required\t\ttrue"
+        minLength: 1
+        type: string
+    required:
+    - key
+    - value
+    type: object
+  settings_handler.SettingResponse:
+    description: Настройка ключа-значение
+    properties:
+      id:
+        description: '@Description Уникальный Id'
+        type: integer
+      key:
+        description: '@Description Уникальный ключ настройки'
+        type: string
+      value:
+        description: '@Description Значение настройки'
+        type: string
+    type: object
+  settings_handler.UpdateSettingRequest:
+    description: Запрос на обновление настройки
+    properties:
+      key:
+        description: "@Description\tУникальный ключ настройки\n\t@Required\t\ttrue"
+        minLength: 1
+        type: string
+      value:
+        description: "@Description\tНовое значение настройки\n\t@Required\t\ttrue"
+        minLength: 1
+        type: string
+    required:
+    - key
+    - value
+    type: object
+  user_handler.CreateUserRequest:
+    description: Запрос на создание пользователя
+    properties:
+      email:
+        description: '@Description Рабочий email'
+        type: string
+      github_name:
+        description: '@Description Имя пользователя в Github'
+        minLength: 2
+        type: string
+      slack_name:
+        description: '@Description Имя пользователя Slack'
+        minLength: 2
+        type: string
+    required:
+    - email
+    - slack_name
+    type: object
+  user_handler.UserResponse:
+    description: Пользователь в системе
+    properties:
+      email:
+        description: '@Description Рабочий email'
+        type: string
+      github_name:
+        description: '@Description Имя пользователя в Github'
+        type: string
+      id:
+        description: '@Description Уникальный Id'
+        type: integer
+      slack_name:
+        description: '@Description Имя пользователя Slack'
+        type: string
+    type: object
+host: localhost:8080/
+info:
+  contact: {}
+  title: API автоматизации рабочих процессов
+  version: "1"
+paths:
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные для генерации токена
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/auth_handler.TokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-auth_handler_TokenResponse'
+        "401":
+          description: Не известный пользователь
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      summary: Генерирует токен авторизации
+      tags:
+      - auth
+  /management/deployments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-array_deployment_handler_DeploymentResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить список всех деплоев
+      tags:
+      - deployments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные деплоя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/deployment_handler.CreateDeploymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-deployment_handler_DeploymentResponse'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Создать новый деплой
+      tags:
+      - deployments
+  /management/deployments/{id}:
+    delete:
+      parameters:
+      - description: ID деплоя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Деплой не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Удалить деплой
+      tags:
+      - deployments
+    get:
+      parameters:
+      - description: ID деплоя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-deployment_handler_DeploymentResponse'
+        "404":
+          description: Деплой не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить информацию о деплое
+      tags:
+      - deployments
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID деплоя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные деплоя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/deployment_handler.UpdateDeploymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-deployment_handler_DeploymentResponse'
+        "404":
+          description: Деплой не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Обновить информацию о деплое
+      tags:
+      - deployments
+  /management/reviews:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-array_code_review_handler_CodeReviewResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить список всех код-ревью
+      tags:
+      - code-reviews
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные код-ревью
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/code_review_handler.CreateCodeReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-code_review_handler_CodeReviewResponse'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Создать новое код-ревью
+      tags:
+      - code-reviews
+  /management/reviews/{id}:
+    delete:
+      parameters:
+      - description: ID код-ревью
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Код-ревью не найдено
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Удалить код-ревью
+      tags:
+      - code-reviews
+    get:
+      parameters:
+      - description: ID код-ревью
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-code_review_handler_CodeReviewResponse'
+        "404":
+          description: Код-ревью не найдено
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить информацию о код-ревью
+      tags:
+      - code-reviews
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID код-ревью
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные код-ревью
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/code_review_handler.UpdateCodeReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-code_review_handler_CodeReviewResponse'
+        "404":
+          description: Код-ревью не найдено
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Обновить информацию о код-ревью
+      tags:
+      - code-reviews
+  /management/settings:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-array_settings_handler_SettingResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить все настройки
+      tags:
+      - settings
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные настройки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/settings_handler.CreateSettingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-settings_handler_SettingResponse'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Создать новую настройку
+      tags:
+      - settings
+  /management/settings/{id}:
+    delete:
+      parameters:
+      - description: ID настройки
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Настройка не найдена
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Удалить настройку
+      tags:
+      - settings
+    get:
+      parameters:
+      - description: ID настройки
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-settings_handler_SettingResponse'
+        "404":
+          description: Настройка не найдена
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации ID
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Получить настройку по ID
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID настройки
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные настройки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/settings_handler.UpdateSettingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-settings_handler_SettingResponse'
+        "404":
+          description: Настройка не найдена
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Обновить настройку
+      tags:
+      - settings
+  /management/users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-array_user_handler_UserResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Возвращает список всех пользователей
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/user_handler.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-user_handler_UserResponse'
+        "422":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Добавляет пользователя в систему
+      tags:
+      - users
+  /management/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Пользователь с таким ID не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Удаляет пользователя
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-user_handler_UserResponse'
+        "404":
+          description: Пользователь с таким ID не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Возвращает информацию о пользователе
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response-user_handler_UserResponse'
+        "404":
+          description: Пользователь с таким ID не найден
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "422":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/api.Response-any'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.Response-any'
+      security:
+      - BearerAuth: []
+      summary: Изменяет информацию о пользователе
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
