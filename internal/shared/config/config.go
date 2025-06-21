@@ -10,9 +10,17 @@ import (
 )
 
 type Config struct {
+	Auth      AuthConfig      `mapstructure:"auth"`
 	Log       LogConfig       `mapstructure:"log"`
 	Server    ServerConfig    `mapstructure:"server"`
 	JsonStore JsonStoreConfig `mapstructure:"jsonStore"`
+}
+
+type AuthConfig struct {
+	Secret   string        `mapstructure:"secret"`
+	Expiry   time.Duration `mapstructure:"expiry"`
+	UserName string        `mapstructure:"userName"`
+	Password string        `mapstructure:"password"`
 }
 
 type LogConfig struct {
@@ -40,8 +48,6 @@ func Load(appName string) *Config {
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("json")
 	viper.AutomaticEnv()
-
-	viper.ReadInConfig()
 
 	if err := viper.ReadInConfig(); err != nil {
 		if !os.IsNotExist(err) {

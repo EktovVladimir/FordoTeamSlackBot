@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/middlewares"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
@@ -16,12 +17,14 @@ import (
 type server struct {
 	app               *app
 	managementHandler *management_handler.Handler
+	authHandler       *auth_handler.Handler
 }
 
 func newServer(
 	app *app,
-	managementHandler *management_handler.Handler) *server {
-	return &server{app, managementHandler}
+	managementHandler *management_handler.Handler,
+	authHandler *auth_handler.Handler) *server {
+	return &server{app, managementHandler, authHandler}
 }
 
 func (s *server) Start(ctx context.Context) {
@@ -34,13 +37,17 @@ func (s *server) Start(ctx context.Context) {
 	router := gin.New()
 
 	router.Use(gin.Recovery())
+
+	authGr := router.Group("/auth")
+	s.authHandler.SetupRoutes(authGr)
+
+	router.Use(middlewares.TokenAuthMiddleware(s.app.cfg.Auth))
 	router.Use(middlewares.LoggingMiddleware())
 
 	managementGr := router.Group("/management")
 	s.managementHandler.SetupRoutes(ctx, managementGr)
 
 	serverConf := s.app.cfg.Server
-
 	addr := fmt.Sprintf("%s:%d", serverConf.Host, serverConf.Port)
 
 	httpServer := &http.Server{
