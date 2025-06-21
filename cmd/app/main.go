@@ -14,6 +14,14 @@ import (
 
 const appName = "team_frodo"
 
+// @title						API автоматизации рабочих процессов
+// @version					1
+// @host						localhost:8080/
+//
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and JWT token.
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

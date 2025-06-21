@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter/json_db"
@@ -39,11 +40,13 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	deploymentRepo := repository.NewJsonDeploymentRepository(store)
 	codeReviewRepo := repository.NewJsonCodeReviewRepository(store)
 
-	managementHandler := management_handler.New(app.cfg.Server, userRepo, settingRepo, deploymentRepo, codeReviewRepo)
+	managementHandler := management_handler.New(userRepo, settingRepo, deploymentRepo, codeReviewRepo)
+	authHandler := auth_handler.New(app.cfg.Auth)
 
 	srv := newServer(
 		app,
-		managementHandler)
+		managementHandler,
+		authHandler)
 
 	srv.Start(ctx)
 

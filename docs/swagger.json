@@ -1,0 +1,1515 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "API автоматизации рабочих процессов",
+        "contact": {},
+        "version": "1"
+    },
+    "host": "localhost:8080/",
+    "paths": {
+        "/auth/token": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Генерирует токен авторизации",
+                "parameters": [
+                    {
+                        "description": "Данные для генерации токена",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth_handler.TokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-auth_handler_TokenResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Не известный пользователь",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка в запросе",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/deployments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Получить список всех деплоев",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-array_deployment_handler_DeploymentResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Создать новый деплой",
+                "parameters": [
+                    {
+                        "description": "Данные деплоя",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/deployment_handler.CreateDeploymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-deployment_handler_DeploymentResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/deployments/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Получить информацию о деплое",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID деплоя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-deployment_handler_DeploymentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Деплой не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Обновить информацию о деплое",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID деплоя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные деплоя",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/deployment_handler.UpdateDeploymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-deployment_handler_DeploymentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Деплой не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Удалить деплой",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID деплоя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Деплой не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/reviews": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "code-reviews"
+                ],
+                "summary": "Получить список всех код-ревью",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-array_code_review_handler_CodeReviewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "code-reviews"
+                ],
+                "summary": "Создать новое код-ревью",
+                "parameters": [
+                    {
+                        "description": "Данные код-ревью",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/code_review_handler.CreateCodeReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-code_review_handler_CodeReviewResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/reviews/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "code-reviews"
+                ],
+                "summary": "Получить информацию о код-ревью",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID код-ревью",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-code_review_handler_CodeReviewResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Код-ревью не найдено",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "code-reviews"
+                ],
+                "summary": "Обновить информацию о код-ревью",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID код-ревью",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные код-ревью",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/code_review_handler.UpdateCodeReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-code_review_handler_CodeReviewResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Код-ревью не найдено",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "code-reviews"
+                ],
+                "summary": "Удалить код-ревью",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID код-ревью",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Код-ревью не найдено",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/settings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Получить все настройки",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-array_settings_handler_SettingResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Создать новую настройку",
+                "parameters": [
+                    {
+                        "description": "Данные настройки",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/settings_handler.CreateSettingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-settings_handler_SettingResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/settings/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Получить настройку по ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID настройки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-settings_handler_SettingResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Настройка не найдена",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Обновить настройку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID настройки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные настройки",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/settings_handler.UpdateSettingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-settings_handler_SettingResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Настройка не найдена",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "settings"
+                ],
+                "summary": "Удалить настройку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID настройки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Настройка не найдена",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации ID",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Возвращает список всех пользователей",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-array_user_handler_UserResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Добавляет пользователя в систему",
+                "parameters": [
+                    {
+                        "description": "Данные пользователя",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user_handler.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-user_handler_UserResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка в запросе",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Возвращает информацию о пользователе",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-user_handler_UserResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Пользователь с таким ID не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка в запросе",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Изменяет информацию о пользователе",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-user_handler_UserResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Пользователь с таким ID не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка в запросе",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Удаляет пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Пользователь с таким ID не найден",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка в запросе",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response-any"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.Error": {
+            "description": "Модель ошибки на запрос",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "Текст ошибки",
+                    "type": "string"
+                }
+            }
+        },
+        "api.Response-any": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные"
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-array_code_review_handler_CodeReviewResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/code_review_handler.CodeReviewResponse"
+                    }
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-array_deployment_handler_DeploymentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/deployment_handler.DeploymentResponse"
+                    }
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-array_settings_handler_SettingResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/settings_handler.SettingResponse"
+                    }
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-array_user_handler_UserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user_handler.UserResponse"
+                    }
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-auth_handler_TokenResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/auth_handler.TokenResponse"
+                        }
+                    ]
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-code_review_handler_CodeReviewResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/code_review_handler.CodeReviewResponse"
+                        }
+                    ]
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-deployment_handler_DeploymentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/deployment_handler.DeploymentResponse"
+                        }
+                    ]
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-settings_handler_SettingResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/settings_handler.SettingResponse"
+                        }
+                    ]
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "api.Response-user_handler_UserResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/user_handler.UserResponse"
+                        }
+                    ]
+                },
+                "error": {
+                    "description": "Ошибка",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/api.Error"
+                        }
+                    ]
+                }
+            }
+        },
+        "auth_handler.TokenRequest": {
+            "description": "запрос на генерацию токена",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "@Description Пароль",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "@Description Имя пользователя",
+                    "type": "string"
+                }
+            }
+        },
+        "auth_handler.TokenResponse": {
+            "description": "Модель со сгенерированным токеном",
+            "type": "object",
+            "properties": {
+                "token": {
+                    "description": "@Description токен",
+                    "type": "string"
+                }
+            }
+        },
+        "code_review_handler.CodeReviewResponse": {
+            "description": "Информация о процессе код-ревью",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "@Description\tУникальный ID\n\t@Example:\t\t1",
+                    "type": "integer"
+                },
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\"",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус код-ревью\n\t@Example:\t\t\"approved\"\n\t@Enum\t\t\tpending,approved,rejected",
+                    "type": "string"
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\"",
+                    "type": "string"
+                }
+            }
+        },
+        "code_review_handler.CreateCodeReviewRequest": {
+            "description": "Запрос на создание код-ревью",
+            "type": "object",
+            "required": [
+                "pull_request_number",
+                "status",
+                "thread_ts"
+            ],
+            "properties": {
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\"\n\t@Required\t\ttrue",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус код-ревью\n\t@Example:\t\t\"pending\"\n\t@Enum\t\t\tpending,approved,rejected\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "approved",
+                        "rejected"
+                    ]
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\"\n\t@Required\t\ttrue",
+                    "type": "string"
+                }
+            }
+        },
+        "code_review_handler.UpdateCodeReviewRequest": {
+            "description": "Запрос на обновление код-ревью",
+            "type": "object",
+            "properties": {
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t\"42\"",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус код-ревью\n\t@Example:\t\t\"approved\"\n\t@Enum\t\t\tpending,approved,rejected",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "approved",
+                        "rejected"
+                    ]
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t\"1234567890.123456\"",
+                    "type": "string"
+                }
+            }
+        },
+        "deployment_handler.CreateDeploymentRequest": {
+            "description": "Запрос на создание деплоя",
+            "type": "object",
+            "required": [
+                "pull_request_number",
+                "status",
+                "thread_ts"
+            ],
+            "properties": {
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t42\n\t@Required\t\ttrue",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус деплоя\n\t@Example:\t\tpending\n\t@Enum\t\t\tpending,success,failed,running\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "success",
+                        "failed",
+                        "running"
+                    ]
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456\n\t@Required\t\ttrue",
+                    "type": "string"
+                },
+                "workflow_run_id": {
+                    "description": "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321",
+                    "type": "string"
+                }
+            }
+        },
+        "deployment_handler.DeploymentResponse": {
+            "description": "Информация о процессе деплоя",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "@Description\tУникальный ID деплоя\n\t@Example:\t\t1",
+                    "type": "integer"
+                },
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t42",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус деплоя\n\t@Example:\t\tsuccess\n\t@Enum\t\t\tpending,success,failed,running",
+                    "type": "string"
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456",
+                    "type": "string"
+                },
+                "workflow_run_id": {
+                    "description": "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321",
+                    "type": "string"
+                }
+            }
+        },
+        "deployment_handler.UpdateDeploymentRequest": {
+            "description": "Запрос на обновление деплоя",
+            "type": "object",
+            "properties": {
+                "pull_request_number": {
+                    "description": "@Description\tНомер Pull Request\n\t@Example:\t\t42",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "@Description\tСтатус деплоя\n\t@Example:\t\tsuccess\n\t@Enum\t\t\tpending,success,failed,running",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "success",
+                        "failed",
+                        "running"
+                    ]
+                },
+                "thread_ts": {
+                    "description": "@Description\tИдентификатор треда в Slack\n\t@Example:\t\t1234567890.123456",
+                    "type": "string"
+                },
+                "workflow_run_id": {
+                    "description": "@Description\tID Workflow Run в GitHub\n\t@Example:\t\t987654321",
+                    "type": "string"
+                }
+            }
+        },
+        "settings_handler.CreateSettingRequest": {
+            "description": "Запрос на создание настройки",
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "key": {
+                    "description": "@Description\tУникальный ключ настройки\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "description": "@Description\tЗначение настройки\n\t@Example:\t\t10485760\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "settings_handler.SettingResponse": {
+            "description": "Настройка ключа-значение",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "@Description Уникальный Id",
+                    "type": "integer"
+                },
+                "key": {
+                    "description": "@Description Уникальный ключ настройки",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "@Description Значение настройки",
+                    "type": "string"
+                }
+            }
+        },
+        "settings_handler.UpdateSettingRequest": {
+            "description": "Запрос на обновление настройки",
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "key": {
+                    "description": "@Description\tУникальный ключ настройки\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "description": "@Description\tНовое значение настройки\n\t@Required\t\ttrue",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "user_handler.CreateUserRequest": {
+            "description": "Запрос на создание пользователя",
+            "type": "object",
+            "required": [
+                "email",
+                "slack_name"
+            ],
+            "properties": {
+                "email": {
+                    "description": "@Description Рабочий email",
+                    "type": "string"
+                },
+                "github_name": {
+                    "description": "@Description Имя пользователя в Github",
+                    "type": "string",
+                    "minLength": 2
+                },
+                "slack_name": {
+                    "description": "@Description Имя пользователя Slack",
+                    "type": "string",
+                    "minLength": 2
+                }
+            }
+        },
+        "user_handler.UserResponse": {
+            "description": "Пользователь в системе",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "@Description Рабочий email",
+                    "type": "string"
+                },
+                "github_name": {
+                    "description": "@Description Имя пользователя в Github",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "@Description Уникальный Id",
+                    "type": "integer"
+                },
+                "slack_name": {
+                    "description": "@Description Имя пользователя Slack",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

@@ -2,9 +2,24 @@ package code_review_handler
 
 import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 
+// CodeReviewResponse model
+//
+//	@Description	Информация о процессе код-ревью
 type CodeReviewResponse struct {
-	Id                types.UniqId `json:"id"`
-	ThreadTs          string       `json:"thread_ts"`
-	PullRequestNumber string       `json:"pull_request_number"`
-	Status            string       `json:"status"`
+	//	@Description	Уникальный ID
+	//	@Example:		1
+	Id types.UniqId `json:"id"`
+
+	//	@Description	Идентификатор треда в Slack
+	//	@Example:		"1234567890.123456"
+	ThreadTs string `json:"thread_ts"`
+
+	//	@Description	Номер Pull Request
+	//	@Example:		"42"
+	PullRequestNumber string `json:"pull_request_number"`
+
+	//	@Description	Статус код-ревью
+	//	@Example:		"approved"
+	//	@Enum			pending,approved,rejected
+	Status string `json:"status"`
 }

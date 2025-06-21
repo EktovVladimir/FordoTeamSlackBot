@@ -20,12 +20,20 @@ func New(repo repository.UserRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/users")
 	group.GET("", h.getUsers)
-	group.GET("/{id}", h.getUser)
+	group.GET("/:id", h.getUser)
 	group.POST("", h.createUser)
-	group.PUT("/{id}", h.updateUser)
-	group.DELETE("/{id}", h.deleteUser)
+	group.PUT("/:id", h.updateUser)
+	group.DELETE("/:id", h.deleteUser)
 }
 
+// @Summary	Возвращает список всех пользователей
+// @Tags		users
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Success	200	{object}	api.Response[[]UserResponse]
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/users [get]
 func (h *Handler) getUsers(c *gin.Context) {
 	c.Request.Context()
 	data, err := h.repo.GetAll(c.Request.Context())
@@ -41,6 +49,17 @@ func (h *Handler) getUsers(c *gin.Context) {
 	}
 }
 
+// @Summary	Возвращает информацию о пользователе
+// @Tags		users
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		id	path		int	true	"ID пользователя"
+// @Success	200	{object}	api.Response[UserResponse]
+// @Failure	422	{object}	api.Response[any]	"Ошибка в запросе"
+// @Failure	404	{object}	api.Response[any]	"Пользователь с таким ID не найден"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/users/{id} [get]
 func (h *Handler) getUser(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -61,6 +80,16 @@ func (h *Handler) getUser(c *gin.Context) {
 	}
 }
 
+// @Summary	Добавляет пользователя в систему
+// @Tags		users
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		message	body		CreateUserRequest	true	"Данные пользователя"
+// @Success	200		{object}	api.Response[UserResponse]
+// @Failure	422		{object}	api.Response[any]	"Ошибка в запросе"
+// @Failure	500		{object}	api.Response[any]
+// @Router		/management/users [post]
 func (h *Handler) createUser(c *gin.Context) {
 	var req CreateUserRequest
 	var dbModel db.User
@@ -81,6 +110,17 @@ func (h *Handler) createUser(c *gin.Context) {
 	}
 }
 
+// @Summary	Изменяет информацию о пользователе
+// @Tags		users
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		id	path		int	true	"ID пользователя"
+// @Success	200	{object}	api.Response[UserResponse]
+// @Failure	422	{object}	api.Response[any]	"Ошибка в запросе"
+// @Failure	404	{object}	api.Response[any]	"Пользователь с таким ID не найден"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/users/{id} [put]
 func (h *Handler) updateUser(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -117,6 +157,17 @@ func (h *Handler) updateUser(c *gin.Context) {
 	}
 }
 
+// @Summary	Удаляет пользователя
+// @Tags		users
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		id	path	int	true	"ID пользователя"
+// @Success	204
+// @Failure	422	{object}	api.Response[any]	"Ошибка в запросе"
+// @Failure	404	{object}	api.Response[any]	"Пользователь с таким ID не найден"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/users/{id} [delete]
 func (h *Handler) deleteUser(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {

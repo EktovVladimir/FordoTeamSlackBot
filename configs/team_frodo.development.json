@@ -1,4 +1,10 @@
 {
+  "auth": {
+    "secret": "secret",
+    "expiry": "60m",
+    "username": "ektov",
+    "password": "12345"
+  },
   "log": {
     "level": "debug",
     "dir": "./logs",

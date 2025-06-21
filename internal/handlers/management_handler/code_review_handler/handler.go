@@ -20,12 +20,19 @@ func New(repo repository.CodeReviewRepository) *Handler {
 func (h *Handler) SetupRoutes(router *gin.RouterGroup) {
 	group := router.Group("/reviews")
 	group.GET("", h.getCodeReviews)
-	group.GET("/{id}", h.getCodeReview)
+	group.GET("/:id", h.getCodeReview)
 	group.POST("", h.createCodeReview)
-	group.PUT("/{id}", h.updateCodeReview)
-	group.DELETE("/{id}", h.deleteCodeReview)
+	group.PUT("/:id}", h.updateCodeReview)
+	group.DELETE("/:id", h.deleteCodeReview)
 }
 
+// @Summary	Получить список всех код-ревью
+// @Tags		code-reviews
+// @Security	BearerAuth
+// @Produce	json
+// @Success	200	{object}	api.Response[[]CodeReviewResponse]
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/reviews [get]
 func (h *Handler) getCodeReviews(c *gin.Context) {
 	data, err := h.repo.GetAll(c.Request.Context())
 	if err != nil {
@@ -40,6 +47,16 @@ func (h *Handler) getCodeReviews(c *gin.Context) {
 	}
 }
 
+// @Summary	Получить информацию о код-ревью
+// @Tags		code-reviews
+// @Security	BearerAuth
+// @Produce	json
+// @Param		id	path		int	true	"ID код-ревью"
+// @Success	200	{object}	api.Response[CodeReviewResponse]
+// @Failure	422	{object}	api.Response[any]	"Ошибка валидации ID"
+// @Failure	404	{object}	api.Response[any]	"Код-ревью не найдено"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/reviews/{id} [get]
 func (h *Handler) getCodeReview(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -60,6 +77,16 @@ func (h *Handler) getCodeReview(c *gin.Context) {
 	}
 }
 
+// @Summary	Создать новое код-ревью
+// @Tags		code-reviews
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		request	body		CreateCodeReviewRequest	true	"Данные код-ревью"
+// @Success	200		{object}	api.Response[CodeReviewResponse]
+// @Failure	422		{object}	api.Response[any]	"Ошибка валидации"
+// @Failure	500		{object}	api.Response[any]
+// @Router		/management/reviews [post]
 func (h *Handler) createCodeReview(c *gin.Context) {
 	var req CreateCodeReviewRequest
 	var dbModel db.CodeReview
@@ -80,6 +107,18 @@ func (h *Handler) createCodeReview(c *gin.Context) {
 	}
 }
 
+// @Summary	Обновить информацию о код-ревью
+// @Tags		code-reviews
+// @Security	BearerAuth
+// @Accept		json
+// @Produce	json
+// @Param		id		path		int						true	"ID код-ревью"
+// @Param		request	body		UpdateCodeReviewRequest	true	"Новые данные код-ревью"
+// @Success	200		{object}	api.Response[CodeReviewResponse]
+// @Failure	422		{object}	api.Response[any]	"Ошибка валидации"
+// @Failure	404		{object}	api.Response[any]	"Код-ревью не найдено"
+// @Failure	500		{object}	api.Response[any]
+// @Router		/management/reviews/{id} [put]
 func (h *Handler) updateCodeReview(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
@@ -116,6 +155,16 @@ func (h *Handler) updateCodeReview(c *gin.Context) {
 	}
 }
 
+// @Summary	Удалить код-ревью
+// @Tags		code-reviews
+// @Security	BearerAuth
+// @Produce	json
+// @Param		id	path	int	true	"ID код-ревью"
+// @Success	204
+// @Failure	422	{object}	api.Response[any]	"Ошибка валидации ID"
+// @Failure	404	{object}	api.Response[any]	"Код-ревью не найдено"
+// @Failure	500	{object}	api.Response[any]
+// @Router		/management/reviews/{id} [delete]
 func (h *Handler) deleteCodeReview(c *gin.Context) {
 	id, err := api_helper.GetUniqIdFromRoute(c)
 	if err != nil {
