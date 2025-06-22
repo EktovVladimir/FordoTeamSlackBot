@@ -47,7 +47,7 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	slackClient := slack.New(app.cfg.Slack.Token, slack.OptionDebug(environment.IsDev))
 	githubClient := github.NewClient(nil).WithAuthToken(app.cfg.Github.Token)
 
-	userFinder := user_finder.New(userRepo, slackClient, githubClient)
+	userFinder := user_finder.New(userRepo, slackClient, githubClient.Search)
 
 	managementHandler := management_handler.New(userRepo, settingRepo, deploymentRepo, codeReviewRepo)
 	authHandler := auth_handler.New(app.cfg.Auth)
