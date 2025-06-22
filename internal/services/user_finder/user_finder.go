@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks/mock.go -package=mocks -source user_finder.go
+
 package user_finder
 
 import (
@@ -12,8 +14,6 @@ import (
 	"github.com/google/go-github/v72/github"
 	"github.com/slack-go/slack"
 )
-
-//go:generate mockgen -destination=mocks/mock.go -package=mocks -source user_finder.go
 
 var (
 	ErrorGithubUserNotFound = errors.New("github user not found")

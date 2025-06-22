@@ -54,6 +54,7 @@ type SlackConfig struct {
 }
 
 type GithubConfig struct {
+	Owner string `mapstructure:"owner"`
 	Token string `mapstructure:"token"`
 }
 
