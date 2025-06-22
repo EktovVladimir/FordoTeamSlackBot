@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package user_finder;
+
+option go_package = "github.com/EktovVladimir/FordoTeamSlackBot/pkg/grpc/user_finder_grpc";
+
+import "google/protobuf/empty.proto";
+
+service UserFinderService {
+  rpc FindByEmail (FindByEmailRequest) returns (UserResponse);
+  rpc FindByEmailWithDb (FindByEmailRequest) returns (UserResponse);
+  rpc SaveUser (SaveUserRequest) returns (SaveUserResponse);
+}
+
+message FindByEmailRequest {
+  string email = 1;
+}
+
+message SaveUserRequest {
+  User user = 1;
+}
+
+message UserResponse {
+  User user = 1;
+  string error = 2;
+}
+
+message SaveUserResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message User {
+  uint64 id = 1;
+  string email = 2;
+  string slack_name = 3;
+  string slack_id = 4;
+  string github_login = 5;
+}

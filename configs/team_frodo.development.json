@@ -3,7 +3,7 @@
     "secret": "secret",
     "expiry": "60m",
     "username": "ektov",
-    "password": "12345"
+    "password": "1"
   },
   "log": {
     "level": "debug",
@@ -16,7 +16,17 @@
     "readTimeoutSec": 300,
     "writeTimeoutSec": 300
   },
+  "grpcServer": {
+    "host": "localhost",
+    "port": 8081
+  },
   "jsonStore": {
     "path": "./data"
+  },
+  "slack": {
+    "token": ""
+  },
+  "github": {
+    "token": ""
   }
 }
