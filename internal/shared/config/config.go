@@ -6,14 +6,18 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
 type Config struct {
-	Auth      AuthConfig      `mapstructure:"auth"`
-	Log       LogConfig       `mapstructure:"log"`
-	Server    ServerConfig    `mapstructure:"server"`
-	JsonStore JsonStoreConfig `mapstructure:"jsonStore"`
+	Auth       AuthConfig       `mapstructure:"auth"`
+	Log        LogConfig        `mapstructure:"log"`
+	Server     ServerConfig     `mapstructure:"server"`
+	GrpcServer GrpcServerConfig `mapstructure:"grpcServer"`
+	JsonStore  JsonStoreConfig  `mapstructure:"jsonStore"`
+	Slack      SlackConfig      `mapstructure:"slack"`
+	Github     GithubConfig     `mapstructure:"github"`
 }
 
 type AuthConfig struct {
@@ -36,8 +40,21 @@ type ServerConfig struct {
 	WriteTimeout time.Duration `mapstructure:"writeTimeout"`
 }
 
+type GrpcServerConfig struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
+}
+
 type JsonStoreConfig struct {
 	Path string `mapstructure:"path"`
+}
+
+type SlackConfig struct {
+	Token string `mapstructure:"token"`
+}
+
+type GithubConfig struct {
+	Token string `mapstructure:"token"`
 }
 
 func Load(appName string) *Config {
@@ -47,6 +64,8 @@ func Load(appName string) *Config {
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("json")
+	viper.SetEnvPrefix(appName)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -69,9 +88,12 @@ func setDefaults() {
 	viper.SetDefault("log.maxAge", 90)
 
 	viper.SetDefault("server.host", "localhost")
-	viper.SetDefault("server.port", 8000)
+	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("server.readTimeout", "60s")
 	viper.SetDefault("server.writeTimeout", "60s")
+
+	viper.SetDefault("grpcServer.host", "localhost")
+	viper.SetDefault("grpcServer.port", 8081)
 
 	viper.SetDefault("jsonStore.path", "./data")
 }

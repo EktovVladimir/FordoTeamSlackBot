@@ -3,7 +3,6 @@ package repository
 import (
 	"cmp"
 	"context"
-	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
@@ -38,10 +37,23 @@ func (r *jsonUserRepository) GetById(ctx context.Context, id types.UniqId) (*db.
 
 	data, found := entity.Get(id)
 	if !found {
-		return nil, errors.New("user not found")
+		return nil, ErrorNotFound
 	}
 
 	return data, nil
+}
+
+func (r *jsonUserRepository) GetByEmail(ctx context.Context, email string) (*db.User, error) {
+	entity := r.db.GetUsers()
+	data := entity.GetAll()
+
+	for _, user := range data {
+		if user.Email == email {
+			return user, nil
+		}
+	}
+
+	return nil, ErrorNotFound
 }
 
 func (r *jsonUserRepository) Create(ctx context.Context, item *db.User) error {

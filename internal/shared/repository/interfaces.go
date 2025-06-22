@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	GetAll(context.Context) ([]*db.User, error)
 	GetById(context.Context, types.UniqId) (*db.User, error)
+	GetByEmail(context.Context, string) (*db.User, error)
 	Create(context.Context, *db.User) error
 	Update(context.Context, *db.User) error
 	Delete(context.Context, types.UniqId) error
