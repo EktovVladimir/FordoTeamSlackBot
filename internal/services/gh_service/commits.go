@@ -1,6 +1,4 @@
-//go:generate mockgen -destination=mocks/mock.go -package=mocks -source commit_retriever.go
-
-package commit_retriever
+package gh_service
 
 import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
@@ -10,19 +8,9 @@ import (
 	"strings"
 )
 
-const (
-	pageSize = 100
-)
+type CommitRetriever service
 
-type githubPullRequestService interface {
-	ListCommits(context.Context, string, string, int, *github.ListOptions) ([]*github.RepositoryCommit, *github.Response, error)
-}
-
-type CommitRetriever struct {
-	ghClient githubPullRequestService
-}
-
-func New(ghClient githubPullRequestService) *CommitRetriever {
+func NewCommitRetriever(ghClient githubPullRequestService) *CommitRetriever {
 	return &CommitRetriever{ghClient}
 }
 

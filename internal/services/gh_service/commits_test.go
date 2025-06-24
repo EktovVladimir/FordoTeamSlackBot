@@ -1,8 +1,8 @@
-package commit_retriever
+package gh_service
 
 import (
 	"errors"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/commit_retriever/mocks"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/gh_service/mocks"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-github/v72/github"
@@ -91,7 +91,7 @@ func initTestStruct(ctrl *gomock.Controller) *testStruct {
 
 	return &testStruct{
 		ghClient: ghClient,
-		service:  New(ghClient),
+		service:  NewCommitRetriever(ghClient),
 	}
 }
 
