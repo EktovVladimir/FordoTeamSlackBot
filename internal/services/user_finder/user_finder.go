@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks/mock.go -source user_finder.go
+
 package user_finder
 
 import (
@@ -14,26 +16,33 @@ import (
 )
 
 var (
-	ErrorSlackEmailNotPresented = errors.New("email not presented by slack")
-	ErrorGithubUserNotFound     = errors.New("github user not found")
+	ErrorGithubUserNotFound = errors.New("github user not found")
 )
 
+type slackClient interface {
+	GetUserByEmailContext(context.Context, string) (*slack.User, error)
+}
+
+type githubSearchService interface {
+	Users(context.Context, string, *github.SearchOptions) (*github.UsersSearchResult, *github.Response, error)
+}
+
 type UserFinder struct {
-	userRepo     repository.UserRepository
-	slackClient  *slack.Client
-	githubClient *github.Client
+	userRepo repository.UserRepository
+	slack    slackClient
+	gh       githubSearchService
 }
 
 func New(userRepo repository.UserRepository,
-	slackClient *slack.Client,
-	githubClient *github.Client) *UserFinder {
-	return &UserFinder{userRepo: userRepo, slackClient: slackClient, githubClient: githubClient}
+	slackClient slackClient,
+	ghSearchService githubSearchService) *UserFinder {
+	return &UserFinder{userRepo, slackClient, ghSearchService}
 }
 
 func (u *UserFinder) FindUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	res := &models.User{}
 
-	slackUser, err := u.slackClient.GetUserByEmailContext(ctx, email)
+	slackUser, err := u.slack.GetUserByEmailContext(ctx, email)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +51,7 @@ func (u *UserFinder) FindUserByEmail(ctx context.Context, email string) (*models
 	res.SlackName = slackUser.Name
 	res.SlackId = slackUser.ID
 
-	ghUsers, _, err := u.githubClient.Search.Users(ctx, fmt.Sprintf("%s in:email", email), &github.SearchOptions{})
+	ghUsers, _, err := u.gh.Users(ctx, fmt.Sprintf("%s in:email", email), &github.SearchOptions{})
 	if err != nil {
 		return res, err
 	}
@@ -63,6 +72,24 @@ func (u *UserFinder) FindUserByEmailWithDb(ctx context.Context, email string) (*
 	}
 
 	return u.FindUserByEmail(ctx, email)
+}
+
+func (u *UserFinder) FindGhReviewer(ctx context.Context, reviewer *models.GhReviewer) (*models.User, error) {
+	email := reviewer.Email
+	return u.FindUserByEmailWithDb(ctx, email)
+}
+
+func (u *UserFinder) FindGhReviewerMany(ctx context.Context, reviewers []*models.GhReviewer) ([]*models.User, error) {
+	res := make([]*models.User, 0)
+	for _, rev := range reviewers {
+		user, _ := u.FindGhReviewer(ctx, rev)
+		if u == nil {
+			continue
+		}
+		res = append(res, user)
+	}
+
+	return res, nil
 }
 
 func (u *UserFinder) SaveUser(ctx context.Context, user *models.User) error {

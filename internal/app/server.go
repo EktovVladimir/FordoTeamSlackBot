@@ -7,6 +7,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/docs"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/review_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/middlewares"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/gin-gonic/gin"
@@ -21,13 +22,19 @@ type server struct {
 	app               *app
 	managementHandler *management_handler.Handler
 	authHandler       *auth_handler.Handler
+	reviewHandler     *review_handler.Handler
 }
 
 func newServer(
 	app *app,
 	managementHandler *management_handler.Handler,
-	authHandler *auth_handler.Handler) *server {
-	return &server{app, managementHandler, authHandler}
+	authHandler *auth_handler.Handler,
+	reviewHandler *review_handler.Handler) *server {
+	return &server{
+		app,
+		managementHandler,
+		authHandler,
+		reviewHandler}
 }
 
 func (s *server) Start(ctx context.Context) {
@@ -55,6 +62,9 @@ func (s *server) Start(ctx context.Context) {
 
 	managementGr := router.Group("/management")
 	s.managementHandler.SetupRoutes(ctx, managementGr)
+
+	crGr := router.Group("/cr")
+	s.reviewHandler.SetupRoutes(crGr)
 
 	httpServer := &http.Server{
 		Addr:         addr,

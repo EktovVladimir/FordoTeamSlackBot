@@ -1,0 +1,4 @@
+#cr <@testUser2>, <@testUser3>
+*Task: *
+1. <https://test.atlassian.net/browse/PROJ-1|Test Issue text>
+*PRs: *<https://github.com/TestOwner/test-repo/pull/100|test-repo>, <https://github.com/TestOwner/test-repo2/pull/200|test-repo2>

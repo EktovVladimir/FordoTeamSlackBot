@@ -6,6 +6,8 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 )
 
+//go:generate mockgen -source=interfaces.go -destination=./mocks/mock.go -package=mocks
+
 type UserRepository interface {
 	GetAll(context.Context) ([]*db.User, error)
 	GetById(context.Context, types.UniqId) (*db.User, error)

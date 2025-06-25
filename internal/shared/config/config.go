@@ -18,6 +18,7 @@ type Config struct {
 	JsonStore  JsonStoreConfig  `mapstructure:"jsonStore"`
 	Slack      SlackConfig      `mapstructure:"slack"`
 	Github     GithubConfig     `mapstructure:"github"`
+	Jira       JiraConfig       `mapstructure:"jira"`
 }
 
 type AuthConfig struct {
@@ -54,7 +55,14 @@ type SlackConfig struct {
 }
 
 type GithubConfig struct {
+	Owner string `mapstructure:"owner"`
 	Token string `mapstructure:"token"`
+}
+
+type JiraConfig struct {
+	BaseUrl string `mapstructure:"baseUrl"`
+	Email   string `mapstructure:"email"`
+	Token   string `mapstructure:"token"`
 }
 
 func Load(appName string) *Config {
