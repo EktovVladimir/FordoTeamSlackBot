@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mocks/mock.go -package=mocks -source user_finder.go
+//go:generate mockgen -destination=mocks/mock.go -source user_finder.go
 
 package user_finder
 
@@ -72,6 +72,24 @@ func (u *UserFinder) FindUserByEmailWithDb(ctx context.Context, email string) (*
 	}
 
 	return u.FindUserByEmail(ctx, email)
+}
+
+func (u *UserFinder) FindGhReviewer(ctx context.Context, reviewer *models.GhReviewer) (*models.User, error) {
+	email := reviewer.Email
+	return u.FindUserByEmailWithDb(ctx, email)
+}
+
+func (u *UserFinder) FindGhReviewerMany(ctx context.Context, reviewers []*models.GhReviewer) ([]*models.User, error) {
+	res := make([]*models.User, 0)
+	for _, rev := range reviewers {
+		user, _ := u.FindGhReviewer(ctx, rev)
+		if u == nil {
+			continue
+		}
+		res = append(res, user)
+	}
+
+	return res, nil
 }
 
 func (u *UserFinder) SaveUser(ctx context.Context, user *models.User) error {

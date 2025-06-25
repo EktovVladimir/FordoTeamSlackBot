@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mocks/mock.go -package=mocks -source gh_service.go
+//go:generate mockgen -destination=mocks/mock.go -source gh_service.go
 
 package gh_service
 
@@ -13,8 +13,10 @@ const (
 
 type githubPullRequestService interface {
 	ListCommits(context.Context, string, string, int, *github.ListOptions) ([]*github.RepositoryCommit, *github.Response, error)
+	ListReviewers(context.Context, string, string, int, *github.ListOptions) (*github.Reviewers, *github.Response, error)
 }
 
 type service struct {
+	//ghClient *github.Client
 	ghClient githubPullRequestService
 }

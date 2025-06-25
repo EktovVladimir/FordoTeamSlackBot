@@ -28,5 +28,10 @@
   },
   "github": {
     "token": ""
+  },
+  "jira": {
+    "baseUrl": "https://aviasales.atlassian.net",
+    "email": "",
+    "token": ""
   }
 }

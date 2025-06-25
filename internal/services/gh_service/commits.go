@@ -48,12 +48,7 @@ func (c *CommitRetriever) GetAllCommits(ctx context.Context, prRef *models.PullR
 	return res, nil
 }
 
-func (c *CommitRetriever) GetIssueNumbers(ctx context.Context, prRef *models.PullRequestRef, issuePattern string) ([]string, error) {
-	commits, err := c.GetAllCommits(ctx, prRef)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *CommitRetriever) GetIssueNumbersMany(ctx context.Context, prRefs []*models.PullRequestRef, issuePattern string) ([]string, error) {
 	//Добавим ignore-case, если не был передан
 	if !strings.HasPrefix(issuePattern, "(?i)") {
 		issuePattern = "(?i)" + issuePattern
@@ -69,22 +64,33 @@ func (c *CommitRetriever) GetIssueNumbers(ctx context.Context, prRef *models.Pul
 	issueSet := make(map[string]struct{})
 	res := make([]string, 0)
 
-	for _, commit := range commits {
-		match := rxp.FindString(commit.Message)
-		if match == "" {
-			continue
+	for _, prRef := range prRefs {
+		commits, err := c.GetAllCommits(ctx, prRef)
+		if err != nil {
+			return nil, err
 		}
 
-		match = strings.Trim(match, " \n\t ")
-		match = strings.ToUpper(match)
+		for _, commit := range commits {
+			match := rxp.FindString(commit.Message)
+			if match == "" {
+				continue
+			}
 
-		_, ok := issueSet[match]
-		if !ok {
+			match = strings.Trim(match, " \n\t ")
+			match = strings.ToUpper(match)
 
-			issueSet[match] = struct{}{}
-			res = append(res, match)
+			_, ok := issueSet[match]
+			if !ok {
+
+				issueSet[match] = struct{}{}
+				res = append(res, match)
+			}
 		}
 	}
 
 	return res, nil
+}
+
+func (c *CommitRetriever) GetIssueNumbers(ctx context.Context, prRef *models.PullRequestRef, issuePattern string) ([]string, error) {
+	return c.GetIssueNumbersMany(ctx, []*models.PullRequestRef{prRef}, issuePattern)
 }
