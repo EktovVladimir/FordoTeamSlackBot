@@ -33,5 +33,9 @@
     "baseUrl": "https://aviasales.atlassian.net",
     "email": "",
     "token": ""
+  },
+  "mongo": {
+    "connection": "mongodb://ektov:123456@localhost:27017/?authSource=frodo",
+    "mainDbName": "frodo"
   }
 }

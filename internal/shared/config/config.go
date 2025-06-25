@@ -19,6 +19,7 @@ type Config struct {
 	Slack      SlackConfig      `mapstructure:"slack"`
 	Github     GithubConfig     `mapstructure:"github"`
 	Jira       JiraConfig       `mapstructure:"jira"`
+	Mongo      MongoDb          `mapstructure:"mongo"`
 }
 
 type AuthConfig struct {
@@ -63,6 +64,11 @@ type JiraConfig struct {
 	BaseUrl string `mapstructure:"baseUrl"`
 	Email   string `mapstructure:"email"`
 	Token   string `mapstructure:"token"`
+}
+
+type MongoDb struct {
+	Connection   string `mapstructure:"connection"`
+	MainDatabase string `mapstructure:"mainDbName"`
 }
 
 func Load(appName string) *Config {

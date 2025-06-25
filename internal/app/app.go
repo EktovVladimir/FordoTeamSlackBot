@@ -12,7 +12,6 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/slack_service"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/user_finder"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/config"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/db_adapter/json_db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 	"github.com/andygrunwald/go-jira"
@@ -20,7 +19,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 	"sync"
-	"time"
 )
 
 type app struct {
@@ -35,20 +33,17 @@ func New(cfg *config.Config, appName string) *app {
 func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 
-	store := json_db.NewStore(app.cfg.JsonStore)
-	if err := store.LoadFromFile(); err != nil {
-		logrus.Errorf("Error loading json data files: %v", err)
+	mongo, err := app.connectMongo(ctx)
+	if err != nil {
+		logrus.Errorf("Error connecting to Mongo: %v", err)
 		return wg
 	}
+	mongoDb := mongo.Database(app.cfg.Mongo.MainDatabase)
 
-	defer store.SyncFilesWithLog()
-
-	store.StartFileSync(ctx, 5*time.Minute)
-
-	userRepo := repository.NewJsonUserRepository(store)
-	settingRepo := repository.NewJsonSettingRepository(store)
-	deploymentRepo := repository.NewJsonDeploymentRepository(store)
-	codeReviewRepo := repository.NewJsonCodeReviewRepository(store)
+	userRepo := repository.NewMongoUserRepository(mongoDb)
+	settingRepo := repository.NewMongoSettingRepository(mongoDb)
+	deploymentRepo := repository.NewMongoDeploymentRepository(mongoDb)
+	codeReviewRepo := repository.NewMongoCodeReviewRepository(mongoDb)
 
 	slackClient := slack.New(app.cfg.Slack.Token, slack.OptionDebug(environment.IsDev))
 	githubClient := github.NewClient(nil).WithAuthToken(app.cfg.Github.Token)
