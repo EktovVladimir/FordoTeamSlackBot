@@ -6,6 +6,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"os"
 	"strings"
 	"testing"
@@ -22,13 +23,10 @@ func TestCreateReviewThread_Success(t *testing.T) {
 		GetChannelId().
 		Return("C0000000000")
 
-	b, err := os.ReadFile("testdata/cr_thread_text.golden")
-	expectText := normalizeSlackMessage(string(b))
-
 	slClient := mocks.NewMockslackClient(ctrl)
 	slClient.EXPECT().
 		SendMessageContext(gomock.Any(), "C0000000000", gomock.Any()).
-		Return("C0000000000", "1750801202.479019", expectText, nil)
+		Return("C0000000000", "1750801202.479019", "", nil)
 
 	service := NewMessagePoster(slClient)
 
@@ -61,14 +59,29 @@ func TestCreateReviewThread_Success(t *testing.T) {
 		},
 	})
 
+	require.NoError(t, err)
+	require.NotNil(t, actual)
+
+	testFilePath := "testdata/cr_thread_text.golden"
+
+	if *update {
+		err = os.WriteFile(testFilePath, []byte(actual.Text), 0644)
+		if err != nil {
+			t.Fatal("Failed to update golden file:", err)
+		}
+		return
+	}
+
+	b, err := os.ReadFile(testFilePath)
+	expectText := normalizeSlackMessage(string(b))
+
 	expected := &models.CreatedMessage{
 		ChannelId:    "C0000000000",
 		Text:         expectText,
-		ResponseText: expectText,
+		ResponseText: "",
 		Ts:           "1750801202.479019",
 	}
 
-	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
 
