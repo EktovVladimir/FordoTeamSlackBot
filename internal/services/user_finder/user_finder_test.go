@@ -2,7 +2,7 @@ package user_finder
 
 import (
 	"errors"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/user_finder/mocks"
+	mocks "github.com/EktovVladimir/FordoTeamSlackBot/internal/services/user_finder/mocks"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"

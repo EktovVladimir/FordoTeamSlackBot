@@ -2,7 +2,7 @@ package gh_service
 
 import (
 	"errors"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/gh_service/mocks"
+	mocks "github.com/EktovVladimir/FordoTeamSlackBot/internal/services/gh_service/mocks"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-github/v72/github"
