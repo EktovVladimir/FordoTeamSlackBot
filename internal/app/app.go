@@ -40,6 +40,7 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 		logrus.Errorf("Error connecting to Mongo: %v", err)
 		return wg
 	}
+	defer mongo.Disconnect(ctx)
 
 	mongoDb := mongo.Database(app.cfg.Mongo.DataBase)
 
