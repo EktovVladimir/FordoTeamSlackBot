@@ -1,5 +1,7 @@
 package user_handler
 
+import "time"
+
 // CreateUserRequest model
 // @Description Запрос на создание пользователя
 type CreateUserRequest struct {
@@ -20,4 +22,9 @@ type UpdateUserRequest struct {
 	GithubName *string `json:"github_name" validate:"omitempty,min=2"`
 	// @Description Рабочий email
 	Email *string `json:"email" validate:"omitempty,email"`
+}
+
+type SearchUsersRequest struct {
+	UpdatedAtFrom *time.Time `json:"updated_at_from" validate:"omitempty,ltfield=UpdatedAtTo"`
+	UpdatedAtTo   *time.Time `json:"updated_at_to" validate:"omitempty,gtfield=UpdatedAtFrom"`
 }
