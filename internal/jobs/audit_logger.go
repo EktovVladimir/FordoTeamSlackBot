@@ -57,8 +57,8 @@ type AuditLogger struct {
 
 func NewAuditLogger(redis *redis.Client, opts ...AuditLoggerOption) *AuditLogger {
 	conf := &auditLoggerConfig{
-		expiry:       30 * time.Minute,
-		interval:     1 * time.Minute,
+		expiry:       0,
+		interval:     5 * time.Minute,
 		logReturners: make([]logReturnerFunc, 0),
 	}
 
@@ -131,7 +131,11 @@ func (l *AuditLogger) runIteration(ctx context.Context, iterCtx *auditLoggerIter
 				value := string(bytes)
 
 				l.redis.LPush(ctx, key, value)
-				l.redis.Expire(ctx, key, l.cfg.expiry)
+
+				if l.cfg.expiry != 0 {
+					l.redis.Expire(ctx, key, l.cfg.expiry)
+				}
+
 				if l.cfg.trimCount > 0 {
 					l.redis.LTrim(ctx, key, 0, l.cfg.trimCount)
 				}
