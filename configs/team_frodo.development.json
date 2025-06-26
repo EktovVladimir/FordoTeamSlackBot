@@ -13,8 +13,8 @@
   "server": {
     "host": "localhost",
     "port": 8080,
-    "readTimeoutSec": 300,
-    "writeTimeoutSec": 300
+    "readTimeout": "5m",
+    "writeTimeout": "5m"
   },
   "grpcServer": {
     "host": "localhost",
@@ -22,6 +22,11 @@
   },
   "jsonStore": {
     "path": "./data"
+  },
+  "auditLogger": {
+    "interval": "1m",
+    "expiry": "60m",
+    "trimCount": 10
   },
   "slack": {
     "token": ""
@@ -33,5 +38,14 @@
     "baseUrl": "https://aviasales.atlassian.net",
     "email": "",
     "token": ""
+  },
+  "mongo": {
+    "connection": "mongodb://ektov:123456@localhost:27017/?authSource=frodo",
+    "db": "frodo"
+  },
+  "redis": {
+    "connection": "localhost:6380",
+    "db": 0,
+    "password": ""
   }
 }

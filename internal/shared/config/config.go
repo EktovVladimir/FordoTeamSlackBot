@@ -11,14 +11,17 @@ import (
 )
 
 type Config struct {
-	Auth       AuthConfig       `mapstructure:"auth"`
-	Log        LogConfig        `mapstructure:"log"`
-	Server     ServerConfig     `mapstructure:"server"`
-	GrpcServer GrpcServerConfig `mapstructure:"grpcServer"`
-	JsonStore  JsonStoreConfig  `mapstructure:"jsonStore"`
-	Slack      SlackConfig      `mapstructure:"slack"`
-	Github     GithubConfig     `mapstructure:"github"`
-	Jira       JiraConfig       `mapstructure:"jira"`
+	Auth        AuthConfig        `mapstructure:"auth"`
+	Log         LogConfig         `mapstructure:"log"`
+	Server      ServerConfig      `mapstructure:"server"`
+	GrpcServer  GrpcServerConfig  `mapstructure:"grpcServer"`
+	JsonStore   JsonStoreConfig   `mapstructure:"jsonStore"`
+	Slack       SlackConfig       `mapstructure:"slack"`
+	Github      GithubConfig      `mapstructure:"github"`
+	Jira        JiraConfig        `mapstructure:"jira"`
+	Mongo       MongoDb           `mapstructure:"mongo"`
+	Redis       Redis             `mapstructure:"redis"`
+	AuditLogger AuditLoggerConfig `mapstructure:"auditLogger"`
 }
 
 type AuthConfig struct {
@@ -63,6 +66,22 @@ type JiraConfig struct {
 	BaseUrl string `mapstructure:"baseUrl"`
 	Email   string `mapstructure:"email"`
 	Token   string `mapstructure:"token"`
+}
+
+type MongoDb struct {
+	Connection string `mapstructure:"connection"`
+	DataBase   string `mapstructure:"db"`
+}
+type Redis struct {
+	Connection string `mapstructure:"connection"`
+	DataBase   int    `mapstructure:"db"`
+	Password   string `mapstructure:"password"`
+}
+
+type AuditLoggerConfig struct {
+	Interval  time.Duration `mapstructure:"interval"`
+	Expiry    time.Duration `mapstructure:"expiry"`
+	TrimCount int64         `mapstructure:"trimCount"`
 }
 
 func Load(appName string) *Config {
