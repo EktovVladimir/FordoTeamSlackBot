@@ -2,10 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 const (
@@ -26,6 +29,7 @@ func (r MongoDeploymentRepository) GetAll(ctx context.Context) ([]*db.Deployment
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
 	var res []*db.Deployment
 	err = cursor.All(ctx, &res)
@@ -47,13 +51,43 @@ func (r MongoDeploymentRepository) GetById(ctx context.Context, id types.UniqId)
 	return &deployment, nil
 }
 
+func (r MongoDeploymentRepository) GetUpdatedBetween(ctx context.Context, start, end time.Time) ([]*db.Deployment, error) {
+	filter := bson.M{
+		"updated_at": bson.M{
+			"$gte": start,
+			"$lte": end,
+		},
+	}
+
+	opts := options.Find().SetSort(bson.D{{"updated_at", 1}})
+
+	cursor, err := r.db.Collection(deploymentCollectionName).Find(ctx, filter, opts)
+	if err != nil {
+		return nil, errors.Join(err, ErrorNotFound)
+	}
+	defer cursor.Close(ctx)
+
+	var items []*db.Deployment
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r MongoDeploymentRepository) Create(ctx context.Context, deployment *db.Deployment) error {
 	deployment.Id = getMongoNextSequence(r.db, deploymentIdSequenceName)
+
+	deployment.CreatedAt = time.Now()
+	deployment.UpdatedAt = time.Now()
+
 	_, err := r.db.Collection(deploymentCollectionName).InsertOne(ctx, deployment)
 	return err
 }
 
 func (r MongoDeploymentRepository) Update(ctx context.Context, deployment *db.Deployment) error {
+	deployment.UpdatedAt = time.Now()
+
 	_, err := r.db.Collection(deploymentCollectionName).
 		UpdateOne(
 			ctx,

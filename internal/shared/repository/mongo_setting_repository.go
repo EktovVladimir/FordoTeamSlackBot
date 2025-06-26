@@ -2,10 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 const (
@@ -26,6 +29,7 @@ func (r MongoSettingRepository) GetAll(ctx context.Context) ([]*db.Setting, erro
 	if err != nil {
 		return nil, err
 	}
+	defer cursor.Close(ctx)
 
 	var res []*db.Setting
 	err = cursor.All(ctx, &res)
@@ -58,13 +62,43 @@ func (r MongoSettingRepository) GetByKey(ctx context.Context, key string) (*db.S
 	return &setting, nil
 }
 
+func (r MongoSettingRepository) GetUpdatedBetween(ctx context.Context, start, end time.Time) ([]*db.Setting, error) {
+	filter := bson.M{
+		"updated_at": bson.M{
+			"$gte": start,
+			"$lte": end,
+		},
+	}
+
+	opts := options.Find().SetSort(bson.D{{"updated_at", 1}})
+
+	cursor, err := r.db.Collection(settingCollectionName).Find(ctx, filter, opts)
+	if err != nil {
+		return nil, errors.Join(err, ErrorNotFound)
+	}
+	defer cursor.Close(ctx)
+
+	var items []*db.Setting
+	if err = cursor.All(ctx, &items); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r MongoSettingRepository) Create(ctx context.Context, setting *db.Setting) error {
 	setting.Id = getMongoNextSequence(r.db, settingIdSequenceName)
+
+	setting.CreatedAt = time.Now()
+	setting.UpdatedAt = time.Now()
+
 	_, err := r.db.Collection(settingCollectionName).InsertOne(ctx, setting)
 	return err
 }
 
 func (r MongoSettingRepository) Update(ctx context.Context, setting *db.Setting) error {
+	setting.UpdatedAt = time.Now()
+
 	_, err := r.db.Collection(settingCollectionName).
 		UpdateOne(
 			ctx,
