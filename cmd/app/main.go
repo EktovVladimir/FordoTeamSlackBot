@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const appName = "team_frodo"
@@ -34,4 +35,10 @@ func main() {
 	application := app.New(cfg, appName)
 
 	application.Run(ctx).Wait()
+
+	select {
+	case <-time.After(5 * time.Second):
+		logrus.Warn("Forced shutdown after timeout")
+	case <-ctx.Done():
+	}
 }

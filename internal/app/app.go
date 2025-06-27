@@ -18,14 +18,18 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
 	"github.com/andygrunwald/go-jira"
 	"github.com/google/go-github/v72/github"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
+	"github.com/uptrace/bun"
 	"sync"
 )
 
 type app struct {
 	cfg     *config.Config
 	appName string
+	pg      *bun.DB
+	redis   *redis.Client
 }
 
 func New(cfg *config.Config, appName string) *app {
@@ -35,28 +39,27 @@ func New(cfg *config.Config, appName string) *app {
 func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	wg := &sync.WaitGroup{}
 
-	mongo, err := app.connectMongo(ctx)
+	var err error
+
+	app.pg, err = app.connectPostgres(ctx)
 	if err != nil {
-		logrus.Errorf("Error connecting to Mongo: %v", err)
+		logrus.Errorf("Error connecting to Postgres: %v", err)
 		return wg
 	}
-	defer mongo.Disconnect(ctx)
 
-	mongoDb := mongo.Database(app.cfg.Mongo.DataBase)
-
-	redis, err := app.connectRedis(ctx)
+	app.redis, err = app.connectRedis(ctx)
 	if err != nil {
 		logrus.Errorf("Error connecting to Redis: %v", err)
 		return wg
 	}
 
-	userRepo := repository.NewMongoUserRepository(mongoDb)
-	settingRepo := repository.NewMongoSettingRepository(mongoDb)
-	deploymentRepo := repository.NewMongoDeploymentRepository(mongoDb)
-	codeReviewRepo := repository.NewMongoCodeReviewRepository(mongoDb)
+	userRepo := repository.NewPostgresUserRepository(app.pg)
+	settingRepo := repository.NewPostgresSettingRepository(app.pg)
+	deploymentRepo := repository.NewPostgresDeploymentRepository(app.pg)
+	codeReviewRepo := repository.NewPostgresCodeReviewRepository(app.pg)
 
 	auditJob := jobs.NewAuditLogger(
-		redis,
+		app.redis,
 		jobs.WithInterval(app.cfg.AuditLogger.Interval),
 		jobs.WithExpiry(app.cfg.AuditLogger.Expiry),
 		jobs.WithTrim(app.cfg.AuditLogger.TrimCount),
@@ -111,6 +114,20 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	go func() {
 		defer wg.Done()
 		gSrv.Start(ctx)
+	}()
+
+	go func() {
+		<-ctx.Done()
+		logrus.Info("Shutting down application...")
+
+		if err := app.pg.Close(); err != nil {
+			logrus.Errorf("Error closing Postgres connection: %v", err)
+		}
+		if err := app.redis.Close(); err != nil {
+			logrus.Errorf("Error closing Redis connection: %v", err)
+		}
+
+		logrus.Info("Resources released")
 	}()
 
 	return wg

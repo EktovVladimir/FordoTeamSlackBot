@@ -24,7 +24,7 @@
     "path": "./data"
   },
   "auditLogger": {
-    "interval": "1m",
+    "interval": "10s",
     "expiry": "60m",
     "trimCount": 10
   },
@@ -38,6 +38,10 @@
     "baseUrl": "https://aviasales.atlassian.net",
     "email": "",
     "token": ""
+  },
+  "postgres": {
+    "connection": "postgres://postgres:postgres@localhost:5432/frodo?sslmode=disable",
+    "db": "frodo"
   },
   "mongo": {
     "connection": "mongodb://ektov:123456@localhost:27017/?authSource=frodo",

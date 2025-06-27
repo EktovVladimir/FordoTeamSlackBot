@@ -2,15 +2,18 @@ package db
 
 import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/uptrace/bun"
 )
 
 type User struct {
-	Id              types.UniqId `json:"id" bson:"_id"`
-	SlackName       string       `json:"slack_name" bson:"slack_name"`
-	SlackId         string       `json:"slack_id" bson:"slack_id"`
-	GithubName      string       `json:"github_name" bson:"github_name"`
-	Email           string       `json:"email" bson:"email"`
-	AuditableFields `bson:",inline"`
+	bun.BaseModel `bun:"table:users,alias:u" bson:"-"`
+
+	Id              types.UniqId `json:"id" bson:"_id" bun:",pk,autoincrement"`
+	SlackName       string       `json:"slack_name" bson:"slack_name" bun:",notnull"`
+	SlackId         string       `json:"slack_id" bson:"slack_id" bun:",notnull"`
+	GithubName      string       `json:"github_name" bson:"github_name" bun:",notnull"`
+	Email           string       `json:"email" bson:"email" bun:",notnull"`
+	AuditableFields `bson:",inline" bun:",embed"`
 }
 
 func (u *User) GetId() types.UniqId {
