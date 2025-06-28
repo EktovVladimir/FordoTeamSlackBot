@@ -12,7 +12,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.11.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.9.3
@@ -25,7 +24,6 @@ require (
 	github.com/uptrace/bun v1.2.14
 	github.com/uptrace/bun/dialect/pgdialect v1.2.14
 	github.com/uptrace/bun/driver/pgdriver v1.2.14
-	go.mongodb.org/mongo-driver v1.17.4
 	golang.org/x/net v0.41.0
 	google.golang.org/grpc v1.67.3
 	google.golang.org/protobuf v1.36.6
@@ -71,6 +69,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect

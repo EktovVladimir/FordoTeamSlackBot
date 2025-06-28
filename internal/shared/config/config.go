@@ -20,7 +20,6 @@ type Config struct {
 	Github      GithubConfig      `mapstructure:"github"`
 	Jira        JiraConfig        `mapstructure:"jira"`
 	Postgres    PostgresConfig    `mapstructure:"postgres"`
-	Mongo       MongoDb           `mapstructure:"mongo"`
 	Redis       Redis             `mapstructure:"redis"`
 	AuditLogger AuditLoggerConfig `mapstructure:"auditLogger"`
 }
@@ -70,11 +69,6 @@ type JiraConfig struct {
 }
 
 type PostgresConfig struct {
-	Connection string `mapstructure:"connection"`
-	DataBase   string `mapstructure:"db"`
-}
-
-type MongoDb struct {
 	Connection string `mapstructure:"connection"`
 	DataBase   string `mapstructure:"db"`
 }
