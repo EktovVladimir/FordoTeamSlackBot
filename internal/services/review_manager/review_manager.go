@@ -1,6 +1,8 @@
 package review_manager
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/gh_service"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/jira_service"
@@ -9,8 +11,6 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/repository"
-	"golang.org/x/net/context"
-	"strconv"
 )
 
 type source interface {
@@ -86,6 +86,16 @@ func (r *ReviewManager) RequestReview(
 		return nil, err
 	}
 
+	_, err = r.createPullRequestDbRecord(ctx, src, prRefs, createdMsg)
+	if err != nil {
+		delErr := r.messagePoster.DeleteMessage(ctx, src, createdMsg.Ts)
+		if delErr != nil {
+			return nil, errors.Join(err, delErr)
+		}
+
+		return nil, err
+	}
+
 	res = &models.CodeReviewFact{
 		Requester: reqUser,
 		Reviewers: revUsers,
@@ -94,19 +104,40 @@ func (r *ReviewManager) RequestReview(
 		Message:   createdMsg,
 	}
 
-	dbModel := &db.CodeReview{
-		ThreadTs: createdMsg.Ts,
-		//Пока достаточно ссылки на 1 pr, в будущем сделать отдельную связь
-		PullRequestNumber: strconv.Itoa(prRefs[0].Number),
-		Status:            "pending",
+	return res, nil
+}
+
+func (r *ReviewManager) createPullRequestDbRecord(ctx context.Context,
+	src source,
+	prRefs []*models.PullRequestRef,
+	createdMsg *models.CreatedMessage) (res *db.CodeReview, err error) {
+
+	dbSlackPostModel := &db.SlackPost{
+		ChannelId: src.GetChannelId(),
+		ThreadTs:  createdMsg.Ts,
+		Type:      db.Thread,
+		Meta:      createdMsg.Meta,
 	}
 
-	err = r.repo.Create(ctx, dbModel)
+	var dbPrModels []*db.PullRequest
+	for _, prRef := range prRefs {
+		dbPrModels = append(dbPrModels, &db.PullRequest{
+			Owner:  prRef.Owner,
+			Repo:   prRef.Repo,
+			Number: prRef.Number,
+		})
+	}
+
+	res = &db.CodeReview{
+		Status:       "pending",
+		PullRequests: dbPrModels,
+		SlackPost:    dbSlackPostModel,
+	}
+
+	err = r.repo.Create(ctx, res)
 	if err != nil {
 		return nil, err
 	}
-
-	res.Id = dbModel.Id
 
 	return res, nil
 }

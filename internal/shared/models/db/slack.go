@@ -10,14 +10,15 @@ const (
 )
 
 type SlackPost struct {
-	bun.BaseModel   `bun:"table:slack_post,alias:sp" bson:"-"`
-	UniqFields      `bson:",inline" bun:",embed"`
-	AuditableFields `bson:",inline" bun:",embed"`
-	DeletedFields   `bson:",inline" bun:",embed"`
+	bun.BaseModel   `bun:"table:slack_post,alias:sp"`
+	UniqFields      `bun:",embed"`
+	AuditableFields `bun:",embed"`
+	DeletedFields   `bun:",embed"`
 
-	ChannelId string        `json:"channel_id" bson:"channel_id" bun:",notnull"`
-	ThreadTs  string        `json:"thread_ts" bson:"thread_ts" bun:",notnull"`
-	Type      SlackPostType `json:"type" bson:"type" bun:",notnull"`
+	ChannelId string         `bun:",notnull"`
+	ThreadTs  string         `bun:",notnull"`
+	Type      SlackPostType  `bun:",notnull"`
+	Meta      map[string]any `bun:",type:jsonb"`
 }
 
 func (s SlackPostType) String() string {

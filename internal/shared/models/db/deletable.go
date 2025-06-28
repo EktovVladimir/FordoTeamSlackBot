@@ -7,7 +7,7 @@ type Deletable interface {
 }
 
 type DeletedFields struct {
-	DeletedAt time.Time `json:"deleted_at" bson:"deleted_at"`
+	DeletedAt time.Time `bun:",nullzero"`
 }
 
 func (d *DeletedFields) IsDeleted() bool {

@@ -12,4 +12,5 @@ type CreatedMessage struct {
 	ChannelId    string
 	ResponseText string
 	Text         string
+	Meta         map[string]any
 }

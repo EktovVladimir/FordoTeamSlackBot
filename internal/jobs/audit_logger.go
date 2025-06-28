@@ -104,6 +104,12 @@ func (l *AuditLogger) Start(ctx context.Context) {
 }
 
 func (l *AuditLogger) runIteration(ctx context.Context, iterCtx *auditLoggerIterationContext) {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorf("Panic in AuditLogger job: %v", r)
+		}
+	}()
+
 	iterCtx.mu.Lock()
 	defer iterCtx.mu.Unlock()
 

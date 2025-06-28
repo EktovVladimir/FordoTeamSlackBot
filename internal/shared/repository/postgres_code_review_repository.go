@@ -20,6 +20,8 @@ func (r *PostgresCodeReviewRepository) GetAll(ctx context.Context) ([]*db.CodeRe
 	var reviews []*db.CodeReview
 	err := r.db.NewSelect().
 		Model(&reviews).
+		Relation("SlackPost").
+		Relation("PullRequests").
 		Scan(ctx)
 
 	if err != nil {
@@ -33,7 +35,9 @@ func (r *PostgresCodeReviewRepository) GetById(ctx context.Context, id db.UniqId
 	var review db.CodeReview
 	err := r.db.NewSelect().
 		Model(&review).
-		Where("id = ?", id).
+		Relation("SlackPost").
+		Relation("PullRequests").
+		Where("cr.id = ?", id).
 		Scan(ctx)
 
 	if err != nil {
@@ -47,8 +51,10 @@ func (r *PostgresCodeReviewRepository) GetUpdatedBetween(ctx context.Context, st
 	var reviews []*db.CodeReview
 	err := r.db.NewSelect().
 		Model(&reviews).
-		Where("updated_at BETWEEN ? AND ?", start, end).
-		Order("updated_at ASC").
+		Relation("SlackPost").
+		Relation("PullRequests").
+		Where("cr.updated_at BETWEEN ? AND ?", start, end).
+		Order("cr.updated_at ASC").
 		Scan(ctx)
 
 	if err != nil {
@@ -59,12 +65,55 @@ func (r *PostgresCodeReviewRepository) GetUpdatedBetween(ctx context.Context, st
 }
 
 func (r *PostgresCodeReviewRepository) Create(ctx context.Context, review *db.CodeReview) error {
-	_, err := r.db.NewInsert().
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func(tx bun.Tx) {
+		_ = tx.Rollback()
+	}(tx)
+
+	_, err = tx.NewInsert().
+		Model(review.SlackPost).
+		Returning("*").
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	review.SlackPostId = review.SlackPost.Id
+
+	_, err = tx.NewInsert().
+		Model(&review.PullRequests).
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NewInsert().
 		Model(review).
 		Returning("*").
 		Exec(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	relations := make([]*db.CodeReviewToPR, 0)
+	for _, record := range review.PullRequests {
+		relations = append(relations, &db.CodeReviewToPR{
+			CodeReviewId:  review.Id,
+			PullRequestId: record.Id,
+		})
+	}
+
+	_, err = tx.NewInsert().
+		Model(&relations).
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (r *PostgresCodeReviewRepository) Update(ctx context.Context, review *db.CodeReview) error {
@@ -79,10 +128,29 @@ func (r *PostgresCodeReviewRepository) Update(ctx context.Context, review *db.Co
 }
 
 func (r *PostgresCodeReviewRepository) Delete(ctx context.Context, id db.UniqId) error {
-	_, err := r.db.NewDelete().
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func(tx bun.Tx) {
+		_ = tx.Rollback()
+	}(tx)
+
+	_, err = tx.NewDelete().
+		Model((*db.CodeReviewToPR)(nil)).
+		Where("code_review_id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.NewDelete().
 		Model((*db.CodeReview)(nil)).
 		Where("id = ?", id).
 		Exec(ctx)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return tx.Commit()
 }
