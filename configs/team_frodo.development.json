@@ -1,7 +1,7 @@
 {
   "auth": {
     "secret": "secret",
-    "expiry": "60m",
+    "expiry": "168h",
     "username": "ektov",
     "password": "1"
   },
@@ -24,8 +24,8 @@
     "path": "./data"
   },
   "auditLogger": {
-    "interval": "1m",
-    "expiry": "60m",
+    "interval": "30s",
+    "expiry": "24h",
     "trimCount": 10
   },
   "slack": {
@@ -39,8 +39,8 @@
     "email": "",
     "token": ""
   },
-  "mongo": {
-    "connection": "mongodb://ektov:123456@localhost:27017/?authSource=frodo",
+  "postgres": {
+    "connection": "postgres://postgres:postgres@localhost:5432/frodo?sslmode=disable",
     "db": "frodo"
   },
   "redis": {

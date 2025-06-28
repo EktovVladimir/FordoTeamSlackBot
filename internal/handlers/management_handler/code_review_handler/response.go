@@ -1,6 +1,8 @@
 package code_review_handler
 
-import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+import (
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
+)
 
 // CodeReviewResponse model
 //
@@ -8,7 +10,7 @@ import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 type CodeReviewResponse struct {
 	//	@Description	Уникальный ID
 	//	@Example:		1
-	Id types.UniqId `json:"id"`
+	Id db.UniqId `json:"id"`
 
 	//	@Description	Идентификатор треда в Slack
 	//	@Example:		"1234567890.123456"

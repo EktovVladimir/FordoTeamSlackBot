@@ -8,8 +8,8 @@ type Auditable interface {
 }
 
 type AuditableFields struct {
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	CreatedAt time.Time `json:"created_at" bson:"created_at" bun:",notnull,default:current_timestamp"`
+	UpdatedAt time.Time `json:"updated_at" bson:"updated_at" bun:",notnull,default:current_timestamp"`
 }
 
 func (a AuditableFields) GetCreatedAt() time.Time {

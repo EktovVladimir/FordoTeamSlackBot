@@ -17,7 +17,7 @@ func MapDbUserToModel(in *db.User) *models.User {
 
 func MapUserToDb(in *models.User) *db.User {
 	return &db.User{
-		Id:         in.Id,
+		UniqFields: db.WithId(in.Id),
 		Email:      in.Email,
 		SlackId:    in.SlackId,
 		SlackName:  in.SlackName,

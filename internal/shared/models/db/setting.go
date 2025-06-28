@@ -1,20 +1,14 @@
 package db
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/uptrace/bun"
 )
 
 type Setting struct {
-	Id              types.UniqId `json:"id" bson:"_id"`
-	Key             string       `json:"key" bson:"key"`
-	Value           string       `json:"value" bson:"value"`
-	AuditableFields `bson:",inline"`
-}
+	bun.BaseModel   `bun:"table:settings,alias:s"`
+	UniqFields      `bun:",embed"`
+	AuditableFields `bun:",embed"`
 
-func (u *Setting) GetId() types.UniqId {
-	return u.Id
-}
-
-func (u *Setting) SetId(id types.UniqId) {
-	u.Id = id
+	Key   string `bun:",notnull"`
+	Value string `bun:",notnull"`
 }

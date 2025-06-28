@@ -19,7 +19,7 @@ type Config struct {
 	Slack       SlackConfig       `mapstructure:"slack"`
 	Github      GithubConfig      `mapstructure:"github"`
 	Jira        JiraConfig        `mapstructure:"jira"`
-	Mongo       MongoDb           `mapstructure:"mongo"`
+	Postgres    PostgresConfig    `mapstructure:"postgres"`
 	Redis       Redis             `mapstructure:"redis"`
 	AuditLogger AuditLoggerConfig `mapstructure:"auditLogger"`
 }
@@ -68,10 +68,11 @@ type JiraConfig struct {
 	Token   string `mapstructure:"token"`
 }
 
-type MongoDb struct {
+type PostgresConfig struct {
 	Connection string `mapstructure:"connection"`
 	DataBase   string `mapstructure:"db"`
 }
+
 type Redis struct {
 	Connection string `mapstructure:"connection"`
 	DataBase   int    `mapstructure:"db"`

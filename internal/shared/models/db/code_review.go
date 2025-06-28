@@ -1,21 +1,32 @@
 package db
 
 import (
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/uptrace/bun"
 )
 
 type CodeReview struct {
-	Id                types.UniqId `json:"id" bson:"_id"`
-	ThreadTs          string       `json:"thread_ts" bson:"thread_ts"`
-	PullRequestNumber string       `json:"pull_request_number" bson:"pull_request_number"`
-	Status            string       `json:"status" bson:"status"`
-	AuditableFields   `bson:",inline"`
+	bun.BaseModel   `bun:"table:code_reviews,alias:cr"`
+	UniqFields      `bun:",embed"`
+	AuditableFields `bun:",embed"`
+
+	SlackPostId UniqId     `bun:",notnull"`
+	SlackPost   *SlackPost `bun:"rel:belongs-to,join:slack_post_id=id"`
+
+	PullRequests []*PullRequest `bun:"m2m:code_review_pull_requests,join:CodeReview=PullRequest"`
+
+	Status string `bun:",notnull"`
+
+	//Устаревшее
+	ThreadTs          string `bun:",notnull"`
+	PullRequestNumber string `bun:",notnull"`
 }
 
-func (u *CodeReview) GetId() types.UniqId {
-	return u.Id
-}
+type CodeReviewToPR struct {
+	bun.BaseModel `bun:"table:code_review_pull_requests,alias:crpr"`
 
-func (u *CodeReview) SetId(id types.UniqId) {
-	u.Id = id
+	CodeReviewId  UniqId `bun:",notnull,pk"`
+	PullRequestId UniqId `bun:",notnull,pk"`
+
+	CodeReview  *CodeReview  `bun:"rel:belongs-to,join:code_review_id=id"`
+	PullRequest *PullRequest `bun:"rel:belongs-to,join:pull_request_id=id"`
 }

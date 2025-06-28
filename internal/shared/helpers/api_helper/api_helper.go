@@ -3,7 +3,7 @@ package api_helper
 import (
 	"encoding/json"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/api"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/copier"
@@ -61,7 +61,7 @@ func MapIgnoreEmpty[T1 any, T2 any](from *T1, to *T2) error {
 		})
 }
 
-func GetUniqIdFromRoute(c *gin.Context) (types.UniqId, error) {
+func GetUniqIdFromRoute(c *gin.Context) (db.UniqId, error) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || id <= 0 {

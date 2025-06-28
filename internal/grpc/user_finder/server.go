@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/user_finder"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 	"github.com/EktovVladimir/FordoTeamSlackBot/pkg/grpc/proto/user_finder"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -70,7 +70,7 @@ func convertModelToProto(user *models.User) *user_finder_grpc.User {
 
 func convertProtoToModel(user *user_finder_grpc.User) *models.User {
 	return &models.User{
-		Id:          types.UniqId(user.Id),
+		Id:          db.UniqId(user.Id),
 		Email:       user.Email,
 		SlackName:   user.SlackName,
 		SlackId:     user.SlackId,

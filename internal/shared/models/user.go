@@ -1,9 +1,9 @@
 package models
 
-import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
 
 type User struct {
-	Id          types.UniqId
+	Id          db.UniqId
 	Email       string
 	SlackId     string
 	SlackName   string
