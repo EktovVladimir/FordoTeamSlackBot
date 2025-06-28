@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"sync"
@@ -23,7 +22,7 @@ type BetweenRetriever[T auditableEntity] interface {
 
 type auditableEntity interface {
 	db.Auditable
-	GetId() types.UniqId
+	db.HasUniqId
 }
 
 type AuditLoggerOption func(*auditLoggerConfig)
@@ -36,11 +35,11 @@ type auditLoggerIterationContext struct {
 }
 
 type auditLogEntry struct {
-	UniqId    types.UniqId `json:"uniq_id"`
-	Name      string       `json:"Name"`
-	Label     string       `json:"Label"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	Data      any          `json:"Data"`
+	UniqId    db.UniqId `json:"uniq_id"`
+	Name      string    `json:"Name"`
+	Label     string    `json:"Label"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Data      any       `json:"Data"`
 }
 
 type auditLoggerConfig struct {

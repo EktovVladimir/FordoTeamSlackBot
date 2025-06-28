@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"github.com/uptrace/bun"
 	"time"
 )
@@ -30,7 +29,7 @@ func (r *PostgresDeploymentRepository) GetAll(ctx context.Context) ([]*db.Deploy
 	return deployments, nil
 }
 
-func (r *PostgresDeploymentRepository) GetById(ctx context.Context, id types.UniqId) (*db.Deployment, error) {
+func (r *PostgresDeploymentRepository) GetById(ctx context.Context, id db.UniqId) (*db.Deployment, error) {
 	var deployment db.Deployment
 	err := r.db.NewSelect().
 		Model(&deployment).
@@ -79,7 +78,7 @@ func (r *PostgresDeploymentRepository) Update(ctx context.Context, deployment *d
 	return err
 }
 
-func (r *PostgresDeploymentRepository) Delete(ctx context.Context, id types.UniqId) error {
+func (r *PostgresDeploymentRepository) Delete(ctx context.Context, id db.UniqId) error {
 	_, err := r.db.NewDelete().
 		Model((*db.Deployment)(nil)).
 		Where("id = ?", id).

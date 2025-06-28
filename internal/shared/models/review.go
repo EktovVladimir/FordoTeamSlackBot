@@ -1,9 +1,11 @@
 package models
 
-import "github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
+import (
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
+)
 
 type CodeReviewFact struct {
-	Id        types.UniqId
+	Id        db.UniqId
 	Requester *User
 	Reviewers []*User
 	Issues    []*JiraIssue

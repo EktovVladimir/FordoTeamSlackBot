@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"github.com/uptrace/bun"
 	"time"
 )
@@ -30,7 +29,7 @@ func (r *PostgresCodeReviewRepository) GetAll(ctx context.Context) ([]*db.CodeRe
 	return reviews, nil
 }
 
-func (r *PostgresCodeReviewRepository) GetById(ctx context.Context, id types.UniqId) (*db.CodeReview, error) {
+func (r *PostgresCodeReviewRepository) GetById(ctx context.Context, id db.UniqId) (*db.CodeReview, error) {
 	var review db.CodeReview
 	err := r.db.NewSelect().
 		Model(&review).
@@ -79,7 +78,7 @@ func (r *PostgresCodeReviewRepository) Update(ctx context.Context, review *db.Co
 	return err
 }
 
-func (r *PostgresCodeReviewRepository) Delete(ctx context.Context, id types.UniqId) error {
+func (r *PostgresCodeReviewRepository) Delete(ctx context.Context, id db.UniqId) error {
 	_, err := r.db.NewDelete().
 		Model((*db.CodeReview)(nil)).
 		Where("id = ?", id).

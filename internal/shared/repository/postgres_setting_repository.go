@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models/db"
-	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/types"
 	"github.com/uptrace/bun"
 	"time"
 )
@@ -30,7 +29,7 @@ func (r *PostgresSettingRepository) GetAll(ctx context.Context) ([]*db.Setting, 
 	return settings, nil
 }
 
-func (r *PostgresSettingRepository) GetById(ctx context.Context, id types.UniqId) (*db.Setting, error) {
+func (r *PostgresSettingRepository) GetById(ctx context.Context, id db.UniqId) (*db.Setting, error) {
 	var setting db.Setting
 	err := r.db.NewSelect().
 		Model(&setting).
@@ -93,7 +92,7 @@ func (r *PostgresSettingRepository) Update(ctx context.Context, setting *db.Sett
 	return err
 }
 
-func (r *PostgresSettingRepository) Delete(ctx context.Context, id types.UniqId) error {
+func (r *PostgresSettingRepository) Delete(ctx context.Context, id db.UniqId) error {
 	_, err := r.db.NewDelete().
 		Model((*db.Setting)(nil)).
 		Where("id = ?", id).
