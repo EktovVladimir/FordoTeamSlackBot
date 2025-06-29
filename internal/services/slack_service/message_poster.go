@@ -4,6 +4,7 @@ package slack_service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/utils/slackutils"
@@ -55,20 +56,25 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 
 	if len(message.Issues) > 1 {
 		sb.WriteString(slackutils.B("Tasks: "))
-	} else {
+		sb.WriteString(slackutils.JiraIssueList(message.Issues...))
+	} else if len(message.Issues) == 1 {
 		sb.WriteString(slackutils.B("Task: "))
+		sb.WriteString(slackutils.JiraIssue(message.Issues[0]))
+	} else {
+		sb.WriteString(slackutils.B("Without task"))
 	}
-
-	sb.WriteString(slackutils.JiraIssueList(message.Issues...))
 	sb.WriteString(slackutils.N())
 
 	if len(message.Prs) > 1 {
 		sb.WriteString(slackutils.B("PRs: "))
-	} else {
+		sb.WriteString(slackutils.PullRequestList(message.Prs...))
+	} else if len(message.Prs) == 1 {
 		sb.WriteString(slackutils.B("PR: "))
+		sb.WriteString(slackutils.PullRequest(message.Prs[0]))
+	} else {
+		return nil, errors.New("PR count is zero")
 	}
-
-	sb.WriteString(slackutils.PullRequestList(message.Prs...))
+	sb.WriteString(slackutils.N())
 
 	text := sb.String()
 
@@ -83,6 +89,7 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 		slack.MsgOptionPost(),
 		slack.MsgOptionText(text, false),
 		slack.MsgOptionMetadata(meta),
+		slack.MsgOptionDisableLinkUnfurl(),
 	}
 
 	if message.AsUser {

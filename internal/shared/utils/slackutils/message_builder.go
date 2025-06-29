@@ -66,17 +66,25 @@ func InlineList(list ...string) string {
 func JiraIssueList(issues ...*models.JiraIssue) string {
 	urls := make([]string, 0)
 	for _, v := range issues {
-		urls = append(urls, Link(v.GetUrl(), v.Title))
+		urls = append(urls, JiraIssue(v))
 	}
 
 	return OrdList(urls...)
 }
 
+func JiraIssue(issue *models.JiraIssue) string {
+	return Link(issue.GetUrl(), fmt.Sprintf("[%s] %s", issue.Key, issue.Title))
+}
+
 func PullRequestList(prs ...*models.PullRequestRef) string {
 	urls := make([]string, 0)
 	for _, v := range prs {
-		urls = append(urls, Link(v.GetUrl(), v.Repo))
+		urls = append(urls, PullRequest(v))
 	}
 
 	return InlineList(urls...)
+}
+
+func PullRequest(pr *models.PullRequestRef) string {
+	return Link(pr.GetUrl(), pr.Repo)
 }

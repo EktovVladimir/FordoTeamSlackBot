@@ -40,12 +40,23 @@ func (h *Handler) requestReview(c *gin.Context) {
 
 	logrus.Debugf("command %v\ntext %v\nuserID %v\nchannelId %v\nresponseURL %v\n", command, text, userId, channelId, responseURL)
 
-	c.String(http.StatusOK, "")
-
 	ctx := context.Background()
 
 	go func() {
-		userCtx, userCancel := context.WithTimeout(ctx, 5*time.Second)
+		_, err = h.slackClient.PostEphemeralContext(
+			ctx,
+			channelId,
+			userId,
+			slack.MsgOptionText(":hourglass_flowing_sand: Запрос принят, работаем...", false))
+		if err != nil {
+			logrus.Error(err)
+		}
+	}()
+
+	c.String(http.StatusOK, "")
+
+	go func() {
+		userCtx, userCancel := context.WithTimeout(ctx, 60*time.Second)
 		defer userCancel()
 
 		slUser, err := h.slackClient.GetUserInfoContext(userCtx, userId)
@@ -70,7 +81,7 @@ func (h *Handler) requestReview(c *gin.Context) {
 			return
 		}
 
-		reviewCtx, reviewCancel := context.WithTimeout(ctx, 5*time.Second)
+		reviewCtx, reviewCancel := context.WithTimeout(ctx, 60*time.Second)
 		defer reviewCancel()
 
 		_, err = h.reviewManager.RequestReview(reviewCtx, src, prs)
