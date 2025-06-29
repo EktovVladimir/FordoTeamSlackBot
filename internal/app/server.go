@@ -8,6 +8,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/review_handler"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/slack_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/middlewares"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/environment"
 	"github.com/gin-gonic/gin"
@@ -23,18 +24,21 @@ type server struct {
 	managementHandler *management_handler.Handler
 	authHandler       *auth_handler.Handler
 	reviewHandler     *review_handler.Handler
+	slackHandler      *slack_handler.Handler
 }
 
 func newServer(
 	app *app,
 	managementHandler *management_handler.Handler,
 	authHandler *auth_handler.Handler,
-	reviewHandler *review_handler.Handler) *server {
+	reviewHandler *review_handler.Handler,
+	slackHandler *slack_handler.Handler) *server {
 	return &server{
 		app,
 		managementHandler,
 		authHandler,
-		reviewHandler}
+		reviewHandler,
+		slackHandler}
 }
 
 func (s *server) Start(ctx context.Context) {
@@ -57,8 +61,13 @@ func (s *server) Start(ctx context.Context) {
 	authGr := router.Group("/auth")
 	s.authHandler.SetupRoutes(authGr)
 
-	router.Use(middlewares.TokenAuthMiddleware(s.app.cfg.Auth))
 	router.Use(middlewares.LoggingMiddleware())
+
+	slackGr := router.Group("/slack")
+	slackGr.Use(middlewares.VerifySlackRequest(s.app.cfg.Slack))
+	s.slackHandler.SetupRoutes(slackGr)
+
+	router.Use(middlewares.TokenAuthMiddleware(s.app.cfg.Auth))
 
 	managementGr := router.Group("/management")
 	s.managementHandler.SetupRoutes(ctx, managementGr)

@@ -3,14 +3,14 @@ package review_manager
 type RequestReviewOption func(*requestReviewConfig) error
 
 type requestReviewConfig struct {
-	onBehalfUser       bool
+	AsUser             bool
 	preferredReviewers []string
 	jiraProject        string
 }
 
 func defaultCreateThreadConfig() *requestReviewConfig {
 	return &requestReviewConfig{
-		onBehalfUser:       false,
+		AsUser:             false,
 		preferredReviewers: []string{},
 		jiraProject:        "OTA[A-Z]+",
 	}
@@ -35,6 +35,13 @@ func WithPreferredReviewers(preferredReviewers []string) RequestReviewOption {
 func WithJiraProject(jiraProject string) RequestReviewOption {
 	return func(config *requestReviewConfig) error {
 		config.jiraProject = jiraProject
+		return nil
+	}
+}
+
+func WithAsUser() RequestReviewOption {
+	return func(config *requestReviewConfig) error {
+		config.AsUser = true
 		return nil
 	}
 }

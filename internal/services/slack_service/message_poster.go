@@ -14,6 +14,10 @@ type source interface {
 	GetChannelId() string
 }
 
+type sourceWithUser interface {
+	GetUserId() string
+}
+
 type slackClient interface {
 	SendMessageContext(context.Context, string, ...slack.MsgOption) (string, string, string, error)
 	DeleteMessageContext(context.Context, string, string) (string, string, error)
@@ -70,12 +74,30 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 		},
 	}
 
+	opts := []slack.MsgOption{
+		slack.MsgOptionPost(),
+		slack.MsgOptionText(text, false),
+		slack.MsgOptionMetadata(meta),
+	}
+
+	if message.AsUser && m._client != nil {
+		if srcWithUser, ok := src.(sourceWithUser); ok {
+			userInfo, err := m._client.GetUserInfo(srcWithUser.GetUserId())
+			if err != nil {
+				return nil, err
+			}
+
+			opts = append(opts,
+				slack.MsgOptionAsUser(true),
+				slack.MsgOptionUsername(userInfo.Profile.DisplayName),
+				slack.MsgOptionIconURL(userInfo.Profile.Image192))
+		}
+	}
+
 	channelId, ts, respText, err := m.slClient.SendMessageContext(
 		ctx,
 		src.GetChannelId(),
-		slack.MsgOptionPost(),
-		slack.MsgOptionText(text, false),
-		slack.MsgOptionMetadata(meta))
+		opts...)
 	if err != nil {
 		return nil, err
 	}

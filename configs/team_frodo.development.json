@@ -24,12 +24,13 @@
     "path": "./data"
   },
   "auditLogger": {
-    "interval": "30s",
+    "interval": "1h",
     "expiry": "24h",
     "trimCount": 10
   },
   "slack": {
-    "token": ""
+    "token": "",
+    "signing": ""
   },
   "github": {
     "token": ""

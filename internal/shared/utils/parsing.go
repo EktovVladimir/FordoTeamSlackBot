@@ -6,6 +6,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -37,4 +38,21 @@ func ParsePullRequestRefFromUrlMany(urls []string) ([]*models.PullRequestRef, er
 	}
 
 	return res, nil
+}
+
+func ParsePullRequestRefFromUrlTextMany(text string) ([]*models.PullRequestRef, error) {
+	words := strings.Fields(text)
+
+	urls := make([]string, 0)
+	for _, word := range words {
+		if prRegexp.MatchString(word) {
+			urls = append(urls, word)
+		}
+	}
+
+	if len(urls) == 0 {
+		return nil, errors.New("no GitHub PR URLs found in text")
+	}
+
+	return ParsePullRequestRefFromUrlMany(urls)
 }
