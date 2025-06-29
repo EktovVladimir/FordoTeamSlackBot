@@ -4,6 +4,7 @@ package slack_service
 
 import (
 	"context"
+	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/utils/slackutils"
 	"github.com/slack-go/slack"
@@ -21,6 +22,7 @@ type sourceWithUser interface {
 type slackClient interface {
 	SendMessageContext(context.Context, string, ...slack.MsgOption) (string, string, string, error)
 	DeleteMessageContext(context.Context, string, string) (string, string, error)
+	GetUserInfo(string) (*slack.User, error)
 }
 
 type MessagePoster struct {
@@ -46,6 +48,9 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 
 	sb.WriteString("#cr ")
 	sb.WriteString(slackutils.UserMentions(message.Reviewers...))
+	sb.WriteString(slackutils.N())
+
+	sb.WriteString(fmt.Sprintf("From %s", slackutils.UserMention(message.Requester)))
 	sb.WriteString(slackutils.N())
 
 	if len(message.Issues) > 1 {
@@ -80,17 +85,16 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 		slack.MsgOptionMetadata(meta),
 	}
 
-	if message.AsUser && m._client != nil {
+	if message.AsUser {
 		if srcWithUser, ok := src.(sourceWithUser); ok {
-			userInfo, err := m._client.GetUserInfo(srcWithUser.GetUserId())
+			userInfo, err := m.slClient.GetUserInfo(srcWithUser.GetUserId())
 			if err != nil {
 				return nil, err
 			}
 
 			opts = append(opts,
-				slack.MsgOptionAsUser(true),
 				slack.MsgOptionUsername(userInfo.Profile.DisplayName),
-				slack.MsgOptionIconURL(userInfo.Profile.Image192))
+				slack.MsgOptionIconURL(userInfo.Profile.ImageOriginal))
 		}
 	}
 

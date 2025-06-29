@@ -2,6 +2,7 @@ package slack_handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/review_manager"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/utils"
 	"github.com/gin-gonic/gin"
@@ -49,7 +50,9 @@ func (h *Handler) requestReview(c *gin.Context) {
 
 		slUser, err := h.slackClient.GetUserInfoContext(userCtx, userId)
 		if err != nil {
-			logrus.Errorf("Failed to get user info: %v", err)
+			msg := fmt.Sprintf("Failed to get user info: %v", err)
+			logrus.Error(msg)
+			_, _ = h.slackClient.PostEphemeralContext(ctx, channelId, userId, slack.MsgOptionText(msg, false))
 			return
 		}
 
@@ -61,16 +64,20 @@ func (h *Handler) requestReview(c *gin.Context) {
 
 		prs, err := utils.ParsePullRequestRefFromUrlTextMany(text)
 		if err != nil {
-			logrus.Errorf("Failed to parse PR URLs: %v", err)
+			msg := fmt.Sprintf("Failed to parse PR URLs: %v", err)
+			logrus.Error(msg)
+			_, _ = h.slackClient.PostEphemeralContext(ctx, channelId, userId, slack.MsgOptionText(msg, false))
 			return
 		}
 
 		reviewCtx, reviewCancel := context.WithTimeout(ctx, 5*time.Second)
 		defer reviewCancel()
 
-		_, err = h.reviewManager.RequestReview(reviewCtx, src, prs, review_manager.WithAsUser())
+		_, err = h.reviewManager.RequestReview(reviewCtx, src, prs)
 		if err != nil {
-			logrus.Errorf("Failed to create review: %v", err)
+			msg := fmt.Sprintf("Failed to create review: %v", err)
+			logrus.Error(msg)
+			_, _ = h.slackClient.PostEphemeralContext(ctx, channelId, userId, slack.MsgOptionText(msg, false))
 			return
 		}
 	}()

@@ -49,6 +49,43 @@ func (mr *MocksourceMockRecorder) GetChannelId() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChannelId", reflect.TypeOf((*Mocksource)(nil).GetChannelId))
 }
 
+// MocksourceWithUser is a mock of sourceWithUser interface.
+type MocksourceWithUser struct {
+	ctrl     *gomock.Controller
+	recorder *MocksourceWithUserMockRecorder
+}
+
+// MocksourceWithUserMockRecorder is the mock recorder for MocksourceWithUser.
+type MocksourceWithUserMockRecorder struct {
+	mock *MocksourceWithUser
+}
+
+// NewMocksourceWithUser creates a new mock instance.
+func NewMocksourceWithUser(ctrl *gomock.Controller) *MocksourceWithUser {
+	mock := &MocksourceWithUser{ctrl: ctrl}
+	mock.recorder = &MocksourceWithUserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MocksourceWithUser) EXPECT() *MocksourceWithUserMockRecorder {
+	return m.recorder
+}
+
+// GetUserId mocks base method.
+func (m *MocksourceWithUser) GetUserId() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserId")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetUserId indicates an expected call of GetUserId.
+func (mr *MocksourceWithUserMockRecorder) GetUserId() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserId", reflect.TypeOf((*MocksourceWithUser)(nil).GetUserId))
+}
+
 // MockslackClient is a mock of slackClient interface.
 type MockslackClient struct {
 	ctrl     *gomock.Controller
@@ -70,6 +107,37 @@ func NewMockslackClient(ctrl *gomock.Controller) *MockslackClient {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockslackClient) EXPECT() *MockslackClientMockRecorder {
 	return m.recorder
+}
+
+// DeleteMessageContext mocks base method.
+func (m *MockslackClient) DeleteMessageContext(arg0 context.Context, arg1, arg2 string) (string, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMessageContext", arg0, arg1, arg2)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// DeleteMessageContext indicates an expected call of DeleteMessageContext.
+func (mr *MockslackClientMockRecorder) DeleteMessageContext(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMessageContext", reflect.TypeOf((*MockslackClient)(nil).DeleteMessageContext), arg0, arg1, arg2)
+}
+
+// GetUserInfo mocks base method.
+func (m *MockslackClient) GetUserInfo(arg0 string) (*slack.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserInfo", arg0)
+	ret0, _ := ret[0].(*slack.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserInfo indicates an expected call of GetUserInfo.
+func (mr *MockslackClientMockRecorder) GetUserInfo(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInfo", reflect.TypeOf((*MockslackClient)(nil).GetUserInfo), arg0)
 }
 
 // SendMessageContext mocks base method.
