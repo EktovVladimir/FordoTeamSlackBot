@@ -5,6 +5,7 @@ type CrTreadMessage struct {
 	Reviewers []*User
 	Issues    []*JiraIssue
 	Prs       []*PullRequestRef
+	AsUser    bool
 }
 
 type CreatedMessage struct {

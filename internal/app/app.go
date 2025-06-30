@@ -6,6 +6,7 @@ import (
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/auth_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/management_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/review_handler"
+	"github.com/EktovVladimir/FordoTeamSlackBot/internal/handlers/slack_handler"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/jobs"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/gh_service"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/services/jira_service"
@@ -22,7 +23,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 	"github.com/uptrace/bun"
+	"net/http"
 	"sync"
+	"time"
 )
 
 type app struct {
@@ -70,7 +73,12 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 
 	auditJob.Start(ctx)
 
-	slackClient := slack.New(app.cfg.Slack.Token, slack.OptionDebug(environment.IsDev))
+	slackClient := slack.New(
+		app.cfg.Slack.Token,
+		slack.OptionDebug(environment.IsDev),
+		slack.OptionHTTPClient(&http.Client{
+			Timeout: time.Second * 30,
+		}))
 	githubClient := github.NewClient(nil).WithAuthToken(app.cfg.Github.Token)
 
 	tp := jira.BasicAuthTransport{
@@ -90,12 +98,14 @@ func (app *app) Run(ctx context.Context) *sync.WaitGroup {
 	managementHandler := management_handler.New(userRepo, settingRepo, deploymentRepo, codeReviewRepo)
 	authHandler := auth_handler.New(app.cfg.Auth)
 	reviewHandler := review_handler.New(crManager)
+	slackHandler := slack_handler.New(crManager, slackClient)
 
 	srv := newServer(
 		app,
 		managementHandler,
 		authHandler,
-		reviewHandler)
+		reviewHandler,
+		slackHandler)
 
 	wg.Add(1)
 	go func() {

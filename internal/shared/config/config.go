@@ -54,7 +54,8 @@ type JsonStoreConfig struct {
 }
 
 type SlackConfig struct {
-	Token string `mapstructure:"token"`
+	Token   string `mapstructure:"token"`
+	Signing string `mapstructure:"signing"`
 }
 
 type GithubConfig struct {

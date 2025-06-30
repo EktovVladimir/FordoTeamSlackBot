@@ -81,6 +81,7 @@ func (r *ReviewManager) RequestReview(
 		Reviewers: revUsers,
 		Issues:    issues,
 		Prs:       prRefs,
+		AsUser:    conf.AsUser,
 	})
 	if err != nil {
 		return nil, err

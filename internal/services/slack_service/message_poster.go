@@ -4,6 +4,8 @@ package slack_service
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/models"
 	"github.com/EktovVladimir/FordoTeamSlackBot/internal/shared/utils/slackutils"
 	"github.com/slack-go/slack"
@@ -14,9 +16,14 @@ type source interface {
 	GetChannelId() string
 }
 
+type sourceWithUser interface {
+	GetUserId() string
+}
+
 type slackClient interface {
 	SendMessageContext(context.Context, string, ...slack.MsgOption) (string, string, string, error)
 	DeleteMessageContext(context.Context, string, string) (string, string, error)
+	GetUserInfo(string) (*slack.User, error)
 }
 
 type MessagePoster struct {
@@ -44,22 +51,30 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 	sb.WriteString(slackutils.UserMentions(message.Reviewers...))
 	sb.WriteString(slackutils.N())
 
+	sb.WriteString(fmt.Sprintf("From %s", slackutils.UserMention(message.Requester)))
+	sb.WriteString(slackutils.N())
+
 	if len(message.Issues) > 1 {
 		sb.WriteString(slackutils.B("Tasks: "))
-	} else {
+		sb.WriteString(slackutils.JiraIssueList(message.Issues...))
+	} else if len(message.Issues) == 1 {
 		sb.WriteString(slackutils.B("Task: "))
+		sb.WriteString(slackutils.JiraIssue(message.Issues[0]))
+	} else {
+		sb.WriteString(slackutils.B("Without task"))
 	}
-
-	sb.WriteString(slackutils.JiraIssueList(message.Issues...))
 	sb.WriteString(slackutils.N())
 
 	if len(message.Prs) > 1 {
 		sb.WriteString(slackutils.B("PRs: "))
-	} else {
+		sb.WriteString(slackutils.PullRequestList(message.Prs...))
+	} else if len(message.Prs) == 1 {
 		sb.WriteString(slackutils.B("PR: "))
+		sb.WriteString(slackutils.PullRequest(message.Prs[0]))
+	} else {
+		return nil, errors.New("PR count is zero")
 	}
-
-	sb.WriteString(slackutils.PullRequestList(message.Prs...))
+	sb.WriteString(slackutils.N())
 
 	text := sb.String()
 
@@ -70,12 +85,30 @@ func (m *MessagePoster) CreateReviewThread(ctx context.Context, src source, mess
 		},
 	}
 
+	opts := []slack.MsgOption{
+		slack.MsgOptionPost(),
+		slack.MsgOptionText(text, false),
+		slack.MsgOptionMetadata(meta),
+		slack.MsgOptionDisableLinkUnfurl(),
+	}
+
+	if message.AsUser {
+		if srcWithUser, ok := src.(sourceWithUser); ok {
+			userInfo, err := m.slClient.GetUserInfo(srcWithUser.GetUserId())
+			if err != nil {
+				return nil, err
+			}
+
+			opts = append(opts,
+				slack.MsgOptionUsername(userInfo.Profile.DisplayName),
+				slack.MsgOptionIconURL(userInfo.Profile.ImageOriginal))
+		}
+	}
+
 	channelId, ts, respText, err := m.slClient.SendMessageContext(
 		ctx,
 		src.GetChannelId(),
-		slack.MsgOptionPost(),
-		slack.MsgOptionText(text, false),
-		slack.MsgOptionMetadata(meta))
+		opts...)
 	if err != nil {
 		return nil, err
 	}
