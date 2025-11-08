@@ -1,0 +1,17 @@
+name: Test webhook on PR opened
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [opened, closed, reopened]
+  workflow_dispatch:
+
+jobs:
+  create-slack-thread:
+    runs-on: [ self-hosted, Linux ]
+    steps:
+    - name: Send Webhook
+      uses: distributhor/workflow-webhook@v3
+      with:
+        webhook_url: ${{ secrets.WEBHOOK_API_PULL_REQUEST }}
